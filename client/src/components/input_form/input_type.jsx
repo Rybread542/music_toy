@@ -1,16 +1,16 @@
 
 
 
-export function Input_Type({type}) {
+export function Input_Type({type, setArtist, setTitle, setLink}) {
 
             return (
                 <>
                     <div className="input-type-form-details-artist-title">
 
-                        <input type="text" id='artist-input' placeholder={type === 'playlist' ? 'Spotify Link' : "Artist"}/>
+                        <input type="text" id='artist-input' placeholder={type === 'playlist' ? 'Spotify Link' : "Artist"} onChange={type === 'playlist' ? setLink : setArtist}/>
 
                         {type === 'album' || type ==='song' ? 
-                        <input type="text" id='title-input' placeholder="Title"/> 
+                        <input type="text" id='title-input' placeholder="Title" onChange={setTitle}/> 
                         : 
                         null}
 
@@ -19,7 +19,7 @@ export function Input_Type({type}) {
                     <div className="input-type-form-details-search">
 
                         <div className="search-img">
-                            <img src="" alt="" />
+                            <img src={null} alt="" />
                         </div>
 
                         <div className="search-info">
