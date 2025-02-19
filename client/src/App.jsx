@@ -1,11 +1,15 @@
 import { useState } from 'react'
 import { Input_Form } from './components/input_form/input_form'
+import { Output_Results } from './components/output/output_results'
 
 function App() {
 
   const [ currentFormData, setCurrentFormData ] = useState({})
-  async function handleFormSubmit(formInputs) {
+  const [ outputData, setOutputData ] = useState([])
+  const [ load, setLoad ] = useState(true)
 
+  async function handleFormSubmit(formInputs) {
+    console.log(`current form inputs: `, currentFormData)
     const response = await fetch('/api/ai', {
         method : 'POST',
         headers : { 'Content-Type' : 'application/json' },
@@ -13,9 +17,11 @@ function App() {
             formInputs
          })
     })
+    
     const data = await response.json()
-
-    console.log(`response: ${data.message}`)
+    setOutputData(data)
+    console.log(`response: `, data)
+    setLoad(false)
 
     
 }
@@ -24,6 +30,9 @@ function App() {
     <>
     <main>
       <Input_Form handleFormSubmit={handleFormSubmit} setCurrentFormData={setCurrentFormData}/>
+      {!load && (
+        <Output_Results outputData={outputData}/>
+      )}
     </main>
     </>
   )

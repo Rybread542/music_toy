@@ -20,19 +20,18 @@ export function Input_Form({handleFormSubmit, setCurrentFormData}) {
         setOutputType(e.target.value)
     }
 
-    function handleLocalSubmit(e) {
+    const handleLocalSubmit = async(e) =>  {
         e.preventDefault()
         const formInputs = {
             inputType,
             outputType,
             artist,
             title,
-            link,
             comment
         }
 
         setCurrentFormData(formInputs)
-        handleFormSubmit(formInputs)
+        await handleFormSubmit(formInputs)
         
     }
     
@@ -47,8 +46,8 @@ export function Input_Form({handleFormSubmit, setCurrentFormData}) {
                             <span>
                                 <select name="output-type" id="output-type" onChange={handleOutputSelect}>
                                     <option value="songs">Songs</option>
-                                    <option value="albums">Albums</option>
-                                    <option value="artists">Artists</option>
+                                    <option value="album">Albums</option>
+                                    <option value="artist">Artists</option>
                                 </select>
                             </span>
                         </p>
@@ -74,7 +73,7 @@ export function Input_Form({handleFormSubmit, setCurrentFormData}) {
                     </div>
 
                     <div className="input-form-addtl-comment">
-                        <input type="text" placeholder="Additional prompts for the AI" onChange={setComment}/>
+                        <input type="text" placeholder="Additional prompts for the AI" onChange={(e) => setComment(e.target.value)}/>
                     </div>
                     
                     <input type="submit" value={'GO!'}/>

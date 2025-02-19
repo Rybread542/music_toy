@@ -7,10 +7,14 @@ export function Input_Type({type, setArtist, setTitle, setLink}) {
                 <>
                     <div className="input-type-form-details-artist-title">
 
-                        <input type="text" id='artist-input' placeholder={type === 'playlist' ? 'Spotify Link' : "Artist"} onChange={type === 'playlist' ? setLink : setArtist}/>
+                        <input type="text" id='artist-input' placeholder={type === 'playlist' ? 'Spotify Link' : "Artist"} 
+                        onChange={type === 'playlist' ? 
+                        (e) => setLink(e.target.value) 
+                        : 
+                        (e) => setArtist(e.target.value)}/>
 
                         {type === 'album' || type ==='song' ? 
-                        <input type="text" id='title-input' placeholder="Title" onChange={setTitle}/> 
+                        <input type="text" id='title-input' placeholder="Title" onChange={(e) => setTitle(e.target.value)}/> 
                         : 
                         null}
 
