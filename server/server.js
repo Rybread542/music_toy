@@ -2,7 +2,7 @@ const express = require('express')
 const cors = require('cors')
 require('dotenv').config()
 const {getMusicRecs} = require('./AI_talk')
-const {spotifyGetAccessToken, getSpotifyLink} = require('./music_links')
+const {spotifyGetAccessToken, getSpotifyLink, getYoutubeLink} = require('./music_links')
 
 const app = express()
 const PORT = process.env.LISTEN_PORT
@@ -51,17 +51,19 @@ app.post('/api/ai', async (req, res) => {
     let musicRecData = await getMusicRecs(req.body.formInputs)
 
     musicRecData = musicRecData.map(async (item) => {
-        let link = await getSpotifyLink(item.type, item.artist, item.title, spotifyAuthToken)
-
-        if (link.error) {
-            if (link.error.status === 401) {
+        let spotLink = await getSpotifyLink(item.type, item.artist, item.title, spotifyAuthToken)
+        if (spotLink && spotLink.error) {
+            if (spotLink.error.status === 401) {
                 spotifyAuthToken = await spotifyGetAccessToken()
-                link = await getSpotifyLink(item.type, item.artist, item.title, spotifyAuthToken)
+                spotLink = await getSpotifyLink(item.type, item.artist, item.title, spotifyAuthToken)
             }
         }
 
+        let ytLink = await getYoutubeLink(item.type, item.artist, item.title)
+
         return {...item,
-            spotifyLink : link
+            spotifyLink : spotLink,
+            youtubeLink : ytLink
         }
     })
 

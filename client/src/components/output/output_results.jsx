@@ -29,8 +29,10 @@ export function Output_Results({outputData}) {
                                 </div>
                             </div>
                             <div className="output-item-links">
-                                <p>{item.spotifyLink}</p>
-                                <p>link 2</p>
+                                {item.spotifyLink && 
+                                <a href={item.spotifyLink} target="_blank">Spotify</a>}
+                                {item.youtubeLink && 
+                                <a href={item.youtubeLink} target="_blank">Youtube</a>}
                                 <p>link 3</p>
                             </div>
                         </div>

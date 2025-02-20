@@ -2,10 +2,13 @@ require('dotenv').config()
 
 
 // Spotify
-
+// client keys
 const spotifyClientID = process.env.SPOTIFY_API_CLIENT_ID
 const spotifyClientSecret = process.env.SPOTIFY_API_SECRET
 
+
+// Create access token using Client Credentials flow
+// Simple fetch and return. Spotify docs are extremely vague about this setup
 async function spotifyGetAccessToken() {
     const tokenFetch = await fetch('https://accounts.spotify.com/api/token', {
         method : 'POST', 
@@ -24,50 +27,92 @@ async function spotifyGetAccessToken() {
     return tokenJSON.access_token
 }
 
+// Turn a title/artist query into a Spotify link
 async function getSpotifyLink(type, artist, title, token) { 
-    artist = artist.replace(/[^a-zA-Z0-9 ]/g, '').toLowerCase()
-    title = title.replace(/[^a-zA-Z0-9 ]/g, '').toLowerCase()
 
-    if (type === 'song') {
-        type = 'track'
-    }
+    try {
+        // Strip specials and spaces. Spotify API gets mad at them sometimes
+        artist = artist.replace(/[^a-zA-Z0-9 ]/g, '').toLowerCase()
+        title = title.replace(/[^a-zA-Z0-9 ]/g, '').toLowerCase()
 
-    const q = (type === 'artist' ? 
-    `artist:${artist}`
-    :
-    `artist:${artist} ${type}:${title}`)
-    + `&type=${type}&limit=1`
-
-    const params = {
-        method: 'GET',
-        headers: {
-            'Content-Type' : 'application/json',
-            'Authorization' : `Bearer ${token}`
+        // Change 'song' to spotify-friendly 'track'
+        if (type === 'song') {
+            type = 'track'
         }
-    }
 
-    const searchData = await fetch(`https://api.spotify.com/v1/search?q=${q}`, params)
+        // Build query based on inputs. If searching an artist, we don't need a title
+        const q = (type === 'artist' ? 
+        `artist:${artist}`
+        :
+        `artist:${artist} ${type}:${title}`)
 
-    const data = await searchData.json()
-
-    console.log(`data for ${title}: `, data)
-
-    if (data.error) {
-        return data
-    }
-
-    switch(type) {
-
-        case 'track':
-            return data.tracks.items[0].external_urls.spotify
-
-        case 'album':
-            return data.albums.items[0].external_urls.spotify
+        // add URL params
+        + `&type=${type}&limit=1`
         
-        case 'artist':
-            return data.artists.items[0].external_urls.spotify
+        // init fetch params according to docs
+        const params = {
+            method: 'GET',
+            headers: {
+                'Content-Type' : 'application/json',
+                'Authorization' : `Bearer ${token}`
+            }
+        }
+
+        const searchData = await fetch(`https://api.spotify.com/v1/search?q=${q}`, params)
+
+        const data = await searchData.json()
+
+        // we will simply return the entire object to deal with elsewhere in case of error
+        // usually this will be a 401 bad token since tokens last 1hr
+        if (data.error) {
+            return data
+        }
+
+        // returns raw url
+        return data[type+'s'].items[0].external_urls.spotify
     }
+
+    catch (e) {
+        console.log(e)
+        return null
+    }
+    
+    
+
 
 }
 
-module.exports = {spotifyGetAccessToken, getSpotifyLink}
+
+// Youtube
+
+const youtubeAPIKey = process.env.YOUTUBE_API_KEY
+
+async function getYoutubeLink(type, artist, title) {
+    const query = `${title} ${artist} ${type}`
+    const url = `https://www.googleapis.com/youtube/v3/search?part=snippet&q=${encodeURIComponent(query)}&type=video&maxResults=1&key=${youtubeAPIKey}`
+
+    const response = await fetch(url, {
+        method : 'GET',
+        headers : {'Content-Type' : 'application/json'}
+    })
+
+    const data = await response.json()
+
+    console.log('yt data: ', data)
+
+    if (data.items && data.items.length > 0) {
+        const id = data.items[0].id.videoId
+
+        const link = `https://www.youtube.com/watch?v=${id}`
+
+        console.log(`youtube link: ${link}`)
+        return link
+    }
+
+    console.log('no youtube link found')
+    return null
+
+
+}
+
+module.exports = {spotifyGetAccessToken, getSpotifyLink, getYoutubeLink}
