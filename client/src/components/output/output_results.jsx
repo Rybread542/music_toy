@@ -29,7 +29,7 @@ export function Output_Results({outputData}) {
                                 </div>
                             </div>
                             <div className="output-item-links">
-                                <p>link 1</p>
+                                <p>{item.spotifyLink}</p>
                                 <p>link 2</p>
                                 <p>link 3</p>
                             </div>

@@ -42,7 +42,7 @@ export function Input_Form({handleFormSubmit, setCurrentFormData}) {
             <div className="input-form">
                 <form onSubmit={handleLocalSubmit}>
                     <div className="input-form-choose-output-type">
-                        <p>I'm looking for 
+                        <p>I'm looking for
                             <span>
                                 <select name="output-type" id="output-type" onChange={handleOutputSelect}>
                                     <option value="songs">Songs</option>

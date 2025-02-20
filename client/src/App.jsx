@@ -9,6 +9,8 @@ function App() {
   const [ load, setLoad ] = useState(true)
 
   async function handleFormSubmit(formInputs) {
+    setLoad(true)
+    
     console.log(`current form inputs: `, currentFormData)
     const response = await fetch('/api/ai', {
         method : 'POST',
@@ -21,6 +23,7 @@ function App() {
     const data = await response.json()
     setOutputData(data)
     console.log(`response: `, data)
+
     setLoad(false)
 
     

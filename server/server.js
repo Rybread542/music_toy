@@ -2,9 +2,17 @@ const express = require('express')
 const cors = require('cors')
 require('dotenv').config()
 const {getMusicRecs} = require('./AI_talk')
+const {spotifyGetAccessToken, getSpotifyLink} = require('./music_links')
 
 const app = express()
 const PORT = process.env.LISTEN_PORT
+
+let spotifyAuthToken
+(async()=> {
+    spotifyAuthToken = await spotifyGetAccessToken()
+    console.log(`token: ${spotifyAuthToken}`)
+})()
+
 
 app.use(express.json())
 
@@ -39,9 +47,27 @@ app.post('/api/ai', async (req, res) => {
             },
         ]
     }
-    const musicRecData = await getMusicRecs(req.body.formInputs)
-    res.json(musicRecData)
 
+    let musicRecData = await getMusicRecs(req.body.formInputs)
+
+    musicRecData = musicRecData.map(async (item) => {
+        let link = await getSpotifyLink(item.type, item.artist, item.title, spotifyAuthToken)
+
+        if (link.error) {
+            if (link.error.status === 401) {
+                spotifyAuthToken = await spotifyGetAccessToken()
+                link = await getSpotifyLink(item.type, item.artist, item.title, spotifyAuthToken)
+            }
+        }
+
+        return {...item,
+            spotifyLink : link
+        }
+    })
+
+    musicRecData = await Promise.all(musicRecData)
+
+    res.json(musicRecData)
 
 })
 
