@@ -6,10 +6,10 @@ export function Input_Form({handleFormSubmit, setCurrentFormData}) {
     
     const [ inputType, setInputType ] = useState('song')
     const [ outputType, setOutputType ] = useState('song')
-    const [ artist, setArtist ] = useState('')
-    const [ title, setTitle ] = useState('')
+    const [ inputArtist, setInputArtist ] = useState('')
+    const [ inputTitle, setInputTitle ] = useState('')
     const [ link, setLink ] = useState('')
-    const [ comment, setComment ] = useState('None')
+    const [ inputComment, setInputComment ] = useState('None')
 
 
     const handleInputSelect = (e) => {
@@ -22,16 +22,16 @@ export function Input_Form({handleFormSubmit, setCurrentFormData}) {
 
     const handleLocalSubmit = async(e) =>  {
         e.preventDefault()
-        const formInputs = {
+        const inputData = {
             inputType,
             outputType,
-            artist,
-            title,
-            comment
+            inputArtist,
+            inputTitle,
+            inputComment
         }
 
-        setCurrentFormData(formInputs)
-        await handleFormSubmit(formInputs)
+        setCurrentFormData(inputData)
+        await handleFormSubmit(inputData)
         
     }
     
@@ -68,12 +68,12 @@ export function Input_Form({handleFormSubmit, setCurrentFormData}) {
 
                     <div className="input-form-type-details-container">
                         <div className="input-form-type-details">
-                            <Input_Type type={inputType} setArtist={setArtist} setTitle={setTitle} setLink={setLink}/>
+                            <Input_Type type={inputType} setArtist={setInputArtist} setTitle={setInputTitle} setLink={setLink}/>
                         </div>
                     </div>
 
                     <div className="input-form-addtl-comment">
-                        <input type="text" placeholder="Additional prompts for the AI" onChange={(e) => setComment(e.target.value)}/>
+                        <input type="text" placeholder="Additional prompts for the AI" onChange={(e) => setInputComment(e.target.value)}/>
                     </div>
                     
                     <input type="submit" value={'GO!'}/>

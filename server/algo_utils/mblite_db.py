@@ -26,8 +26,6 @@ def db_execute_stmt(query, args):
     try:
         cursor.execute(query, args)
         data = cursor.fetchall()
-        print('data for this db call:')
-        print(data)
         return data
     
     except SyntaxError:

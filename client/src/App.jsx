@@ -8,7 +8,7 @@ function App() {
   const [ outputData, setOutputData ] = useState([])
   const [ load, setLoad ] = useState(true)
 
-  async function handleFormSubmit(formInputs) {
+  async function handleFormSubmit(inputData) {
     setLoad(true)
     
     console.log(`current form inputs: `, currentFormData)
@@ -16,7 +16,7 @@ function App() {
         method : 'POST',
         headers : { 'Content-Type' : 'application/json' },
         body : JSON.stringify({ 
-            formInputs
+            inputData
          })
     })
     

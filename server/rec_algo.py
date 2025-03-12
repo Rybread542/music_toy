@@ -15,7 +15,7 @@ load_dotenv()
 # hopefully, decent descriptor generation
 # return: [string]
 def get_input_tags(input_type, title, artist):
-    print('getting tags')
+
     # Get tag query and set args
     query = os.getenv(f'SELECT_{input_type.upper()}_TAGS')
     query_args = (artist,) if input_type == 'artist' else (artist, title)
@@ -46,7 +46,6 @@ def get_ai_query_mod(comment, query):
     pass
 
 def process_recc(output_type, input_embed, artist_id, comment):
-    print('getting reccomendation outputs...')
     query = os.getenv(f'SELECT_ANN_{output_type.upper()}')
 
     if comment:
@@ -65,21 +64,40 @@ def recommend(input_data):
     input_comment = input_data['input_comment']
 
     # get artist id to filter from results, and genre tags
-    print('getting input tags...')
+    # print('getting input tags...')
+
     input_artist_id, tags_string = get_input_tags(input_type, input_title, input_artist)
-    print('artist id: ', input_artist_id)
-    print(f'input tags: {tags_string}')
+
+    # print('artist id: ', input_artist_id)
+    # print(f'input tags: {tags_string}')
 
     # generate vector embed
-    print('generating embed...')
+    # print('generating embed...')
+
     tags_embed = get_input_embed(tags_string)
-    print(tags_embed)
-    print('done')
+
+    # print(tags_embed)
+    # print('done')
+
     result = process_recc(output_type, tags_embed, input_artist_id, input_comment)
     random.shuffle(result)
 
-    for item in result[:10]:
-        print(item)
+    results_list = []
+
+    for item in result[:3]:
+        if output_type == 'artist':
+            results_list.append({
+                'outputType' : f'{output_type}',
+                'outputArtist' : f'{item[1]}'
+            })
+        else:
+            results_list.append({
+                'outputType' : f'{output_type}',
+                'outputArtist' : f'{item[1]}',
+                'outputTitle' : f'{item[0]}'
+            })
+            
+    return results_list
 
 
 
@@ -108,14 +126,14 @@ def recommend(input_data):
 
 
 if __name__ == '__main__':
-    # data = json.loads(sys.stdin.read())
-
+    input_data = json.loads(sys.argv[1:][0])
     sample_input = {
     'input_type' : 'artist',
-    'output_type' : 'track',
+    'output_type' : 'album',
     'input_title' : '',
     'input_artist' : 'Car Seat Headrest',
     'input_comment' : ''
     }
-    recommend(sample_input)
+    result = recommend(input_data)
+    print(json.dumps(result))
 

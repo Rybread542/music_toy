@@ -1,7 +1,8 @@
 require('dotenv').config()
 
 
-// Spotify
+//////////// Spotify
+
 // client keys
 const spotifyClientID = process.env.SPOTIFY_API_CLIENT_ID
 const spotifyClientSecret = process.env.SPOTIFY_API_SECRET
@@ -88,6 +89,8 @@ async function getSpotifyLink(type, artist, title, token) {
 const youtubeAPIKey = process.env.YOUTUBE_API_KEY
 
 async function getYoutubeLink(type, artist, title) {
+    // youtube links are simpler to get, but much less accurate
+    // best we can do is a raw search query
     const query = `${title} ${artist} ${type}`
     const url = `https://www.googleapis.com/youtube/v3/search?part=snippet&q=${encodeURIComponent(query)}&type=video&maxResults=1&key=${youtubeAPIKey}`
 
@@ -115,4 +118,30 @@ async function getYoutubeLink(type, artist, title) {
 
 }
 
-module.exports = {spotifyGetAccessToken, getSpotifyLink, getYoutubeLink}
+
+async function findLinks(musicObj, spotAuthToken) {
+    const {outputType, outputArtist, outputTitle} = musicObj
+
+    let spotLink = await getSpotifyLink(outputType, outputArtist, outputTitle, spotAuthToken)
+
+    if (spotLink && spotLink.error) {
+                if (spotLink.error.status === 401) {
+                    spotAuthToken = await spotifyGetAccessToken()
+                    spotLink = await getSpotifyLink(item.type, item.artist, item.title, spotifyAuthToken)
+                }
+
+                else {
+                    console.log(`Error fetching Spotify link. Status ${spotLink.error.status}: ${spotLink.error.message}`)
+                }
+            }
+
+
+    let ytLink = await getYoutubeLink(outputType, outputArtist, outputTitle)
+
+    return {...musicObj,
+        spotifyLink : spotLink,
+        youtubeLink : ytLink
+    }
+}
+
+module.exports = {spotifyGetAccessToken, findLinks}
