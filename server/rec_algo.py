@@ -96,7 +96,7 @@ def recommend(input_data):
                 'outputArtist' : f'{item[1]}',
                 'outputTitle' : f'{item[0]}'
             })
-            
+
     return results_list
 
 
@@ -127,13 +127,6 @@ def recommend(input_data):
 
 if __name__ == '__main__':
     input_data = json.loads(sys.argv[1:][0])
-    sample_input = {
-    'input_type' : 'artist',
-    'output_type' : 'album',
-    'input_title' : '',
-    'input_artist' : 'Car Seat Headrest',
-    'input_comment' : ''
-    }
     result = recommend(input_data)
     print(json.dumps(result))
 

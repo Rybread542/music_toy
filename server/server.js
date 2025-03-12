@@ -28,7 +28,6 @@ app.post('/api/ai', async (req, res) => {
     console.log('request body: ', req.body)
 
     let musicRecData = await getRecommendations(req.body.inputData, spotifyAuthToken)
-
     res.json(musicRecData)
 
 })

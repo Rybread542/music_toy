@@ -9,7 +9,7 @@ export function Input_Form({handleFormSubmit, setCurrentFormData}) {
     const [ inputArtist, setInputArtist ] = useState('')
     const [ inputTitle, setInputTitle ] = useState('')
     const [ link, setLink ] = useState('')
-    const [ inputComment, setInputComment ] = useState('None')
+    const [ inputComment, setInputComment ] = useState('')
 
 
     const handleInputSelect = (e) => {

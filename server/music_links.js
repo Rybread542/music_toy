@@ -101,8 +101,6 @@ async function getYoutubeLink(type, artist, title) {
 
     const data = await response.json()
 
-    console.log('yt data: ', data)
-
     if (data.items && data.items.length > 0) {
         const id = data.items[0].id.videoId
 

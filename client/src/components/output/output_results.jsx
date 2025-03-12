@@ -14,11 +14,10 @@ export function Output_Results({outputData}) {
                                     <img src={null} alt="" />
                                 </div>
                                 <div className="output-item-info">
-                                    {item.type === "album" || item.type === "song" ?
+                                    {item.outputType === "album" || item.outputType === "song" ?
                                     (<>
-                                        <p>{item.title}</p>
-                                        <p>{item.artist}</p>
-                                        <p>{item.year}</p>
+                                        <p>{item.outputTitle}</p>
+                                        <p>{item.outputArtist}</p>
                                     </>)
                                     :
                                     (<>

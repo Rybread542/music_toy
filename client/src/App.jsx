@@ -20,6 +20,7 @@ function App() {
          })
     })
     
+    console.log(response)
     const data = await response.json()
     setOutputData(data)
     console.log(`response: `, data)
