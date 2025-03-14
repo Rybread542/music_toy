@@ -1,5 +1,6 @@
 import psycopg2
 import os
+import sys
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -24,6 +25,8 @@ def get_db_cursor():
 def db_execute_stmt(query, args):
     cursor = get_db_cursor()
     try:
+        print(f'Executing the following query: {query}', file=sys.stderr)
+        print(f'With the following parameters: {args}', file=sys.stderr)
         cursor.execute(query, args)
         data = cursor.fetchall()
         return data

@@ -8,13 +8,6 @@ const { spawn } = require('child_process')
 const { findLinks } = require('./music_links')
 
 
-
-
-
-
-
-
-
 /**
  * @param {Object} inputData
  * 
@@ -31,7 +24,7 @@ async function getRecommendations(inputData, spotifyAuthToken) {
 
     console.log(pyFormattedData)
 
-    const pythonReccAlgo = spawn('./bin/python', ['rec_algo.py', pyFormattedData])
+    const pythonReccAlgo = spawn('bin/python', ['./algo_utils/rec_algo.py', pyFormattedData])
 
     return new Promise((resolve) => {
         let pythonData = ''

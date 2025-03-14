@@ -4,8 +4,8 @@ import { use, useState } from "react"
 
 export function Input_Form({handleFormSubmit, setCurrentFormData}) {
     
-    const [ inputType, setInputType ] = useState('song')
-    const [ outputType, setOutputType ] = useState('song')
+    const [ inputType, setInputType ] = useState('track')
+    const [ outputType, setOutputType ] = useState('track')
     const [ inputArtist, setInputArtist ] = useState('')
     const [ inputTitle, setInputTitle ] = useState('')
     const [ link, setLink ] = useState('')
@@ -45,7 +45,7 @@ export function Input_Form({handleFormSubmit, setCurrentFormData}) {
                         <p>I'm looking for
                             <span>
                                 <select name="output-type" id="output-type" onChange={handleOutputSelect}>
-                                    <option value="songs">Songs</option>
+                                    <option value="track">Songs</option>
                                     <option value="album">Albums</option>
                                     <option value="artist">Artists</option>
                                 </select>
@@ -57,10 +57,10 @@ export function Input_Form({handleFormSubmit, setCurrentFormData}) {
                         <p>similar to this
                             <span>
                                 <select name="input-type" id="input-type" onChange={handleInputSelect}>
-                                    <option value="song">Song</option>
+                                    <option value="track">Song</option>
                                     <option value="album">Album</option>
                                     <option value="artist">Artist</option>
-                                    <option value="playlist">Playlist</option>
+                                    {/* <option value="playlist">Playlist</option> */}
                                 </select>
                             </span>
                         </p>

@@ -13,7 +13,7 @@ export function Input_Type({type, setArtist, setTitle, setLink}) {
                         : 
                         (e) => setArtist(e.target.value)}/>
 
-                        {type === 'album' || type ==='song' ? 
+                        {type === 'album' || type ==='track' ? 
                         <input type="text" id='title-input' placeholder="Title" onChange={(e) => setTitle(e.target.value)}/> 
                         : 
                         null}
@@ -28,7 +28,7 @@ export function Input_Type({type, setArtist, setTitle, setLink}) {
 
                         <div className="search-info">
 
-                            {type === 'album' || type === 'song' ? 
+                            {type === 'album' || type === 'track' ? 
                             (<>
                             <p>Title</p>
                             <p>artist</p>

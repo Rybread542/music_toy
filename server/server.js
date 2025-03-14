@@ -1,8 +1,8 @@
 const express = require('express')
 const cors = require('cors')
 require('dotenv').config()
-const { getRecommendations } = require('./processRecData')
-const { spotifyGetAccessToken, getSpotifyLink, getYoutubeLink } = require('./music_links')
+const { getRecommendations } = require('./algo_utils/processRecData')
+const { spotifyGetAccessToken } = require('./algo_utils/music_links')
 
 
 const app = express()

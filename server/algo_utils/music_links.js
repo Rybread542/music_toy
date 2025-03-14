@@ -74,7 +74,7 @@ async function getSpotifyLink(type, artist, title, token) {
     }
 
     catch (e) {
-        console.log(e)
+        console.log(`Couldn\'t find a spotify link for ${title}` )
         return null
     }
     
@@ -110,7 +110,7 @@ async function getYoutubeLink(type, artist, title) {
         return link
     }
 
-    console.log('no youtube link found')
+    console.log(`no youtube link found for ${title}`)
     return null
 
 

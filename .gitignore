@@ -17,6 +17,7 @@ bin
 include
 share
 *.local
+pyvenv.cfg
 
 # Editor directories and files
 .vscode/*
