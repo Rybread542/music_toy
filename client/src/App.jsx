@@ -7,9 +7,12 @@ function App() {
   const [ currentFormData, setCurrentFormData ] = useState({})
   const [ outputData, setOutputData ] = useState([])
   const [ load, setLoad ] = useState(true)
+  const [ outputError, setOutputError ] = useState('')
 
   async function handleFormSubmit(inputData) {
     setLoad(true)
+    setOutputError('')
+    setOutputData([])
     
     console.log(`current form inputs: `, currentFormData)
     const response = await fetch('/api/ai', {
@@ -22,9 +25,15 @@ function App() {
     
     console.log(response)
     const data = await response.json()
-    setOutputData(data)
-    console.log(`response: `, data)
+    if ('error' in data) {
+      setOutputError(data.error)
+    }
 
+    else {
+      setOutputData(data)
+    }
+    
+    console.log(`response: `, data)
     setLoad(false)
 
     
@@ -35,7 +44,7 @@ function App() {
     <main>
       <Input_Form handleFormSubmit={handleFormSubmit} setCurrentFormData={setCurrentFormData}/>
       {!load && (
-        <Output_Results outputData={outputData}/>
+        <Output_Results outputData={outputData} error={outputError}/>
       )}
     </main>
     </>

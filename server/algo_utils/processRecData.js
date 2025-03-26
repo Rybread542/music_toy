@@ -40,6 +40,11 @@ async function getRecommendations(inputData, spotifyAuthToken) {
         pythonReccAlgo.on('close', async (code) => {
             console.log(`python exited with code: ${code}`)
             reccData = JSON.parse(pythonData)
+            if ('error' in reccData) {
+                console.log('error')
+                resolve(reccData)
+                return
+            }
 
             console.log(reccData)
             reccData = reccData.map(async (item) => {
@@ -50,13 +55,5 @@ async function getRecommendations(inputData, spotifyAuthToken) {
         })
     })
 }
-
-// getRecommendations({
-//     inputType : 'artist',
-//     outputType : 'album',
-//     inputTitle : '',
-//     inputArtist : 'Car Seat Headrest',
-//     inputComment : ''
-//     })
 
 module.exports = { getRecommendations }

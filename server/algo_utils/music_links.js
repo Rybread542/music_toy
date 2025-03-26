@@ -1,16 +1,13 @@
-require('dotenv').config()
-
+const { spotifyClientID, spotifyClientSecret, youtubeAPIKey } = require('../misc_utils/dotenv')
 
 //////////// Spotify
 
 // client keys
-const spotifyClientID = process.env.SPOTIFY_API_CLIENT_ID
-const spotifyClientSecret = process.env.SPOTIFY_API_SECRET
-
 
 // Create access token using Client Credentials flow
 // Simple fetch and return. Spotify docs are extremely vague about this setup
 async function spotifyGetAccessToken() {
+
     const tokenFetch = await fetch('https://accounts.spotify.com/api/token', {
         method : 'POST', 
         headers : {
@@ -23,18 +20,21 @@ async function spotifyGetAccessToken() {
             client_secret: spotifyClientSecret,
         }),
     })
-
+    
     const tokenJSON = await tokenFetch.json()
     return tokenJSON.access_token
 }
 
 // Turn a title/artist query into a Spotify link
 async function getSpotifyLink(type, artist, title, token) { 
-
     try {
         // Strip specials and spaces. Spotify API gets mad at them sometimes
         artist = artist.replace(/[^a-zA-Z0-9 ]/g, '').toLowerCase()
-        title = title.replace(/[^a-zA-Z0-9 ]/g, '').toLowerCase()
+        if (title) {
+            title = title.replace(/[^a-zA-Z0-9 ]/g, '').toLowerCase()
+        }
+
+        
 
         // Change 'song' to spotify-friendly 'track'
         if (type === 'song') {
@@ -43,7 +43,7 @@ async function getSpotifyLink(type, artist, title, token) {
 
         // Build query based on inputs. If searching an artist, we don't need a title
         const q = (type === 'artist' ? 
-        `artist:${artist}`
+        `${artist}`
         :
         `artist:${artist} ${type}:${title}`)
 
@@ -68,12 +68,12 @@ async function getSpotifyLink(type, artist, title, token) {
         if (data.error) {
             return data
         }
-
         // returns raw url
         return data[type+'s'].items[0].external_urls.spotify
     }
 
     catch (e) {
+        console.log(`error searching spot link: ` + e)
         console.log(`Couldn\'t find a spotify link for ${title}` )
         return null
     }
@@ -86,13 +86,15 @@ async function getSpotifyLink(type, artist, title, token) {
 
 // Youtube
 
-const youtubeAPIKey = process.env.YOUTUBE_API_KEY
-
 async function getYoutubeLink(type, artist, title) {
     // youtube links are simpler to get, but much less accurate
     // best we can do is a raw search query
-    const query = `${title} ${artist} ${type}`
-    const url = `https://www.googleapis.com/youtube/v3/search?part=snippet&q=${encodeURIComponent(query)}&type=video&maxResults=1&key=${youtubeAPIKey}`
+    
+    const q = type != 'artist' ? `${artist} ${title} ${type === 'album' ? `full album`:``}`:`${artist} music video`
+
+    console.log(`query: ${q}`)
+
+    const url = `https://www.googleapis.com/youtube/v3/search?part=snippet&q=${encodeURIComponent(q)}&type=video&maxResults=1&key=${youtubeAPIKey}`
 
     const response = await fetch(url, {
         method : 'GET',
@@ -100,6 +102,7 @@ async function getYoutubeLink(type, artist, title) {
     })
 
     const data = await response.json()
+    console.log(data)
 
     if (data.items && data.items.length > 0) {
         const id = data.items[0].id.videoId
@@ -112,20 +115,18 @@ async function getYoutubeLink(type, artist, title) {
 
     console.log(`no youtube link found for ${title}`)
     return null
-
-
 }
 
 
 async function findLinks(musicObj, spotAuthToken) {
-    const {outputType, outputArtist, outputTitle} = musicObj
 
+    let {outputType, outputArtist, outputTitle} = musicObj
     let spotLink = await getSpotifyLink(outputType, outputArtist, outputTitle, spotAuthToken)
 
     if (spotLink && spotLink.error) {
                 if (spotLink.error.status === 401) {
                     spotAuthToken = await spotifyGetAccessToken()
-                    spotLink = await getSpotifyLink(item.type, item.artist, item.title, spotifyAuthToken)
+                    spotLink = await getSpotifyLink(outputType, outputArtist, outputTitle, spotAuthToken)
                 }
 
                 else {

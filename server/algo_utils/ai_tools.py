@@ -1,12 +1,13 @@
 import os
 from dotenv import load_dotenv
 from openai import OpenAI
+import sys
 from sentence_transformers import SentenceTransformer
+from logging_config import logger
 
 load_dotenv()
-
-OPENAI_KEY = os.getenv('OPENAI_KEY')
-client = OpenAI(api_key=OPENAI_KEY)
+OPENAI_API_KEY = os.getenv('OPENAI_KEY')
+client = OpenAI(api_key=OPENAI_API_KEY)
 
 def chatbot_get(system_prompt, user_prompt):
     response = client.chat.completions.create(
@@ -17,6 +18,7 @@ def chatbot_get(system_prompt, user_prompt):
         {'role' : 'user',
          'content' : user_prompt}
     ])
+    logger.info(f'AI response: {response}')
     return response.choices[0].message.content
 
 def create_embedding(embed_string):

@@ -2,6 +2,7 @@ import psycopg2
 import os
 import sys
 from dotenv import load_dotenv
+from logging_config import logger
 
 load_dotenv()
 
@@ -22,15 +23,14 @@ db_conn = psycopg2.connect(
 def get_db_cursor():
     return db_conn.cursor()
 
-def db_execute_stmt(query, args):
+def db_execute_stmt(query: str, args: tuple):
     cursor = get_db_cursor()
     try:
-        print(f'Executing the following query: {query}', file=sys.stderr)
-        print(f'With the following parameters: {args}', file=sys.stderr)
         cursor.execute(query, args)
         data = cursor.fetchall()
+        logger.info(f'DATA FOR THIS DB CALL: {data}')
         return data
     
     except SyntaxError:
-        print('SYNTAX ERROR ON EXECUTION')
+        return
 
