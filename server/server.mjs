@@ -1,10 +1,10 @@
-const express = require('express')
-const cors = require('cors')
-require('dotenv').config()
-const { getRecommendations } = require('./algo_utils/processRecData')
-const { spotifyGetAccessToken } = require('./algo_utils/music_links')
-const { liveSearch } = require('./misc_utils/liveSearch')
-const { getSpotifyData } = require('./misc_utils/inputSearch')
+import express, { json } from 'express'
+import cors from 'cors'
+import { configDotenv } from 'dotenv'
+import { getRecommendations } from './algo_utils/processRecData.mjs'
+import { spotifyGetAccessToken } from './algo_utils/music_links.mjs'
+import { liveSearch } from './misc_utils/liveSearch.mjs'
+import { getSpotifyData } from './misc_utils/inputSearch.mjs'
 
 
 const app = express()
@@ -17,7 +17,7 @@ let spotifyAuthToken
 })()
 
 
-app.use(express.json())
+app.use(json())
 
 
 app.get('/', (req, res) => {
@@ -42,13 +42,12 @@ app.post('/api/search', async (req, res) => {
     res.json(searchResults)
 })
 
-app.post('/api/spotsearch'), async (req, res) => {
-    const {type, artist, title} = req.body
-
-    const spotData = await getSpotifyData(type, artist, title, spotifyAuthToken)
+app.post('/api/spotsearch', async (req, res) => {
+    const {inputType, inputArtist, inputTitle} = req.body.searchQuery
+    const spotData = await getSpotifyData(inputType, inputArtist, inputTitle, spotifyAuthToken)
     console.log(spotData)
     res.json(spotData)
-}
+})
 
 app.listen(PORT, () => {
     console.log(`Running on port ${PORT}`)

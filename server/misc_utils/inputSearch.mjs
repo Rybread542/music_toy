@@ -1,35 +1,33 @@
-require('../misc_utils/dotenv')
-const { spotifyGetAccessToken } = require('../algo_utils/music_links')
+import { spotifyGetAccessToken, getSpotifySearchParams } from '../algo_utils/music_links.mjs'
 
-async function getSpotifyData(type, artist, title, token) {
+export async function getSpotifyData(type, artist, title, token) {
     try {
-        artist = artist.replace(/[^a-zA-Z0-9 ]/g, '').toLowerCase()
-        if (title) {
-            title = title.replace(/[^a-zA-Z0-9 ]/g, '').toLowerCase()
+        
+        artist = normalizeString(artist)
+
+        if(title) {
+            title = normalizeString(title)
         }
+
+        console.log(`artist: ` + artist)
+        console.log(`title: ` + title)
+        console.log(`type: ${type}`)
 
         const q = (type === 'artist' ? 
         `${artist}`
         :
         `artist:${artist} ${type}:${title}`)
         + `&type=${type}&limit=1`
-        
-        
-        const params = {
-            method: 'GET',
-            headers: {
-                'Content-Type' : 'application/json',
-                'Authorization' : `Bearer ${token}`
-            }
-        }
+
+        let params = getSpotifySearchParams(token)
 
         let searchData = await fetch(`https://api.spotify.com/v1/search?q=${q}`, params)
 
         let data = await searchData.json()
-        console.log(data)
         if (data.error) {
-            if (data.error.status === 401){
+            if (data.error.status = 401){
                 token = await spotifyGetAccessToken()
+                params = getSpotifySearchParams(token)
                 searchData = await fetch(`https://api.spotify.com/v1/search?q=${q}`, params)
                 data = await searchData.json()
             }
@@ -39,7 +37,7 @@ async function getSpotifyData(type, artist, title, token) {
                 return null
             }
         }
-
+        console.log(data)
         const resultArtist = type != 'artist' ? 
         data[type+'s'].items[0].artists[0].name
         :
@@ -55,7 +53,7 @@ async function getSpotifyData(type, artist, title, token) {
             resultYear = data.tracks.items[0].album.release_date.slice(0,4)
         }
         
-        if (type === 'album') {
+        else if (type === 'album') {
             resultImg = data.albums.items[0].images[0].url
             resultYear = data.albums.items[0].release_date.slice(0,4)
         }
@@ -76,14 +74,28 @@ async function getSpotifyData(type, artist, title, token) {
     }
 
     catch (e) {
-        console.log(`error searching for ${type} data: ` + e)
+        console.log(`error searching for ${type} data: ${e}: ${e.stack}`)
         console.log(`No spotify display data available` )
-        return null
+        return {
+            resultArtist : null,
+            resultTitle : null,
+            resultImg : null,
+            resultYear : null,
+            resultGenres : null
+            }
     }
 
 }
 
-module.exports = { getSpotifyData }
+function normalizeString(string) {
+    return string
+    .toLowerCase()
+    .normalize('NFD')                     
+    .replace(/[\u0300-\u036f]/g, '')      
+    .replace(/[^a-z0-9\s]/g, '')         
+    .replace(/\s+/g, ' ')                  
+    .trim()
+}
 
 
 

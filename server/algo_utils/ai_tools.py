@@ -22,7 +22,8 @@ def chatbot_get(system_prompt, user_prompt):
     return response.choices[0].message.content
 
 def create_embedding(embed_string):
+    print(embed_string, file=sys.stderr)
     embed_model = SentenceTransformer("all-mpnet-base-v2", device='cpu')
-    embed = embed_model.encode(embed_string, convert_to_tensor=False, normalize_embeddings=True)
+    embed = embed_model.encode(embed_string, convert_to_tensor=False, normalize_embeddings=False)
     embed_string = "[" + ', '.join(str(x) for x in embed) + "]"
     return embed_string

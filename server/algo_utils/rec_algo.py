@@ -3,7 +3,7 @@ import sys
 import json
 from dotenv import load_dotenv
 from ai_tools import chatbot_get, create_embedding
-from mblite_db import db_execute_stmt
+from mblite_db import db_execute_stmt, build_ann_query
 import random
 from logging_config import logger
 
@@ -25,15 +25,11 @@ def get_input_tags(input_type: str, title: str, artist: str):
         if not db_tag_data:
             return json.loads(os.getenv('ERROR_EMPTY_DB_RESULT')), ''
         
-
+        print(db_tag_data[0], file=sys.stderr)
         artist_id, tags_output = db_tag_data[0]
         
         if tags_output:
-            # Send tags to chatbot for cleanup (removing tags which compromise the ANN search)
-            ai_output = chatbot_get(system_prompt=os.getenv('AI_CLEAN_TAGS_SYSPROMPT'),
-                            user_prompt = str(tags_output))
-    
-            return artist_id, ai_output
+            return artist_id, tags_output
         
         else:
             prompt = f'Type: {input_type} Artist: {artist}' + (f' Title: {title}' if input_type != 'artist' else '')
@@ -86,25 +82,33 @@ def recommend(input_data: dict):
     input_title = input_data['input_title']
     input_artist = input_data['input_artist']
     input_comment = input_data['input_comment']
+    input_date_range = input_data['input_date_range']
+    input_pop_val = input_data['input_pop_val']
 
     # Grab ANN output query
-    query = os.getenv(f'SELECT_ANN_{output_type.upper()}')
+    # query = os.getenv(f'SELECT_ANN_{output_type.upper()}')
 
 
     # get artist id to filter from results, and genre tags
-    input_artist_id, tags_string = get_input_tags(input_type, input_title, input_artist)
-    logger.info(f'Initial tags from DB: {tags_string}')
+    input_artist_id, tags_string = get_input_tags(input_type, 
+                                                  input_title, 
+                                                  input_artist)
+    
 
     # if it's a dict then it's an error, return
     if isinstance(input_artist_id, dict):
         logger.error(f'EMPTY QUERY RETURNING ERROR TO CLIENT')
         return input_artist_id
+    
 
+    query = build_ann_query(output_type, 
+                            input_artist_id, 
+                            input_date_range, 
+                            input_pop_val)
+    
 
     # send query and tags to chatbot if there is a user comment
     if input_comment:
-
-        logger.info(f'Sending query/tags to AI for mods')
 
         query, tags_string = ai_search_mod(query, tags_string, input_comment)
 
@@ -118,10 +122,13 @@ def recommend(input_data: dict):
 
 
     # convert finalized set of tags to a vector embedding
+    if isinstance(tags_string, list):
+        tags_string = str(tags_string)
+        
     tags_embed = get_input_embed(tags_string)
 
     # query db with embedding and artist ID to filter
-    result = db_execute_stmt(query, (tags_embed, input_artist_id))
+    result = db_execute_stmt(query, (tags_embed,))
 
     # shuffle results for pseudo variety
     random.shuffle(result)
@@ -142,7 +149,8 @@ def recommend(input_data: dict):
                 'outputArtist' : f'{item[1]}',
                 'outputTitle' : f'{item[0]}',
                 'outputYear' : f'{item[2]}',
-                'outputGenres' : f'{item[3]}'
+                'outputGenres' : f'{item[3]}',
+                'outputMBID' : f'{item[4]}'
             })
 
     logger.info(f'FINAL RESULTS: {results_list}')

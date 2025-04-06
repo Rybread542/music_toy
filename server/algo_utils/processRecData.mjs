@@ -4,8 +4,8 @@
 *
 */
 
-const { spawn } = require('child_process')
-const { findLinks } = require('./music_links')
+import { spawn } from 'child_process'
+import { findLinks } from './music_links.mjs'
 
 
 /**
@@ -13,12 +13,14 @@ const { findLinks } = require('./music_links')
  * 
  * @returns {Object} JSON 
 */
-async function getRecommendations(inputData, spotifyAuthToken) {
+export async function getRecommendations(inputData, spotifyAuthToken) {
     let pyFormattedData = JSON.stringify({
         input_type : inputData.inputType,
         output_type : inputData.outputType,
         input_artist : inputData.inputArtist,
         input_title : inputData.inputTitle,
+        input_date_range : inputData.dateRange,
+        input_pop_val : inputData.popVal,
         input_comment : inputData.inputComment
     })
 
@@ -46,14 +48,13 @@ async function getRecommendations(inputData, spotifyAuthToken) {
                 return
             }
 
-            console.log(reccData)
+            
             reccData = reccData.map(async (item) => {
                 return await findLinks(item, spotifyAuthToken)
             })
             reccData = await Promise.all(reccData)
+            console.log('reccdata:', reccData)
             resolve(reccData)
         })
     })
 }
-
-module.exports = { getRecommendations }

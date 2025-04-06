@@ -1,4 +1,5 @@
-const { spotifyClientID, spotifyClientSecret, youtubeAPIKey } = require('../misc_utils/dotenv')
+import { spotifyClientID, spotifyClientSecret, youtubeAPIKey } from '../misc_utils/dotenv.mjs';
+import { CoverArtArchiveApi } from 'musicbrainz-api'
 
 //////////// Spotify
 
@@ -6,8 +7,8 @@ const { spotifyClientID, spotifyClientSecret, youtubeAPIKey } = require('../misc
 
 // Create access token using Client Credentials flow
 // Simple fetch and return. Spotify docs are extremely vague about this setup
-async function spotifyGetAccessToken() {
-
+export async function spotifyGetAccessToken() {
+    console.log('generating token')
     const tokenFetch = await fetch('https://accounts.spotify.com/api/token', {
         method : 'POST', 
         headers : {
@@ -22,7 +23,18 @@ async function spotifyGetAccessToken() {
     })
     
     const tokenJSON = await tokenFetch.json()
+    console.log(tokenJSON)
     return tokenJSON.access_token
+}
+
+export function getSpotifySearchParams(token) {
+    return {
+        method: 'GET',
+        headers: {
+            'Content-Type' : 'application/json',
+            'Authorization' : `Bearer ${token}`
+        }
+    }
 }
 
 // Turn a title/artist query into a Spotify link
@@ -34,7 +46,7 @@ async function getSpotifyLink(type, artist, title, token) {
             title = title.replace(/[^a-zA-Z0-9 ]/g, '').toLowerCase()
         }
 
-        
+        let artistPhoto = null
 
         // Change 'song' to spotify-friendly 'track'
         if (type === 'song') {
@@ -51,13 +63,7 @@ async function getSpotifyLink(type, artist, title, token) {
         + `&type=${type}&limit=1`
         
         // init fetch params according to docs
-        const params = {
-            method: 'GET',
-            headers: {
-                'Content-Type' : 'application/json',
-                'Authorization' : `Bearer ${token}`
-            }
-        }
+        let params = getSpotifySearchParams(token)
 
         const searchData = await fetch(`https://api.spotify.com/v1/search?q=${q}`, params)
 
@@ -66,20 +72,23 @@ async function getSpotifyLink(type, artist, title, token) {
         // we will simply return the entire object to deal with elsewhere in case of error
         // usually this will be a 401 bad token since tokens last 1hr
         if (data.error) {
-            return data
+            return {spotLink: data, artistPhoto : null}
         }
+
+        if (type === 'artist') {
+            artistPhoto = data.artists.items[0].images[0].url
+        }
+        
+        const spotLink = data[type+'s'].items[0].external_urls.spotify
         // returns raw url
-        return data[type+'s'].items[0].external_urls.spotify
+        return {spotLink, artistPhoto}
     }
 
     catch (e) {
         console.log(`error searching spot link: ` + e)
         console.log(`Couldn\'t find a spotify link for ${title}` )
-        return null
+        return {spotLink: null, artistPhoto: null}
     }
-    
-    
-
 
 }
 
@@ -117,16 +126,37 @@ async function getYoutubeLink(type, artist, title) {
     return null
 }
 
+//MB Album art search
 
-async function findLinks(musicObj, spotAuthToken) {
+async function getAlbumArt(mbid) {
 
-    let {outputType, outputArtist, outputTitle} = musicObj
-    let spotLink = await getSpotifyLink(outputType, outputArtist, outputTitle, spotAuthToken)
+    try { 
+        const covertArtApi = new CoverArtArchiveApi()
 
+        const coverData = await covertArtApi.getReleaseGroupCover(mbid, 'front')
+        return coverData.url
+    }
+
+    catch(e) {
+        console.log('error grabbing cover art', e)
+        return null
+    }
+}
+
+
+
+
+
+
+
+export async function findLinks(musicObj, spotAuthToken) {
+
+    let {outputType, outputArtist, outputTitle, outputMBID} = musicObj
+    let {spotLink, artistPhoto} = await getSpotifyLink(outputType, outputArtist, outputTitle, spotAuthToken)
     if (spotLink && spotLink.error) {
                 if (spotLink.error.status === 401) {
                     spotAuthToken = await spotifyGetAccessToken()
-                    spotLink = await getSpotifyLink(outputType, outputArtist, outputTitle, spotAuthToken)
+                    ({spotLink, artistPhoto} = await getSpotifyLink(outputType, outputArtist, outputTitle, spotAuthToken))
                 }
 
                 else {
@@ -137,10 +167,17 @@ async function findLinks(musicObj, spotAuthToken) {
 
     let ytLink = await getYoutubeLink(outputType, outputArtist, outputTitle)
 
+    let albumArtLink = null
+    if (outputType != 'artist'){
+        albumArtLink = await getAlbumArt(outputMBID)
+    }
+    
+
     return {...musicObj,
         spotifyLink : spotLink,
-        youtubeLink : ytLink
+        youtubeLink : ytLink,
+        albumArt: albumArtLink,
+        artistPhoto: artistPhoto
     }
 }
 
-module.exports = {spotifyGetAccessToken, findLinks}
