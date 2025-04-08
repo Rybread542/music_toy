@@ -3,6 +3,8 @@
 
 :root {
     --bg-color: #000000;
+    --bg-color-2-purp: #130d2e;
+    --bg-color-3-blue: #070733;
     --window-color-darkblue: #2a28b1de;
     --window-color-purp: #3618a3ea;
     --accent-color-lightblue: #b5eaff;
@@ -37,9 +39,9 @@ html {
 }
 
 main {
-    height: 100vh;
-    background-color: var(--bg-color);
     color: var(--font-primary);
+    width: 100vw;
+    height: 100vh;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -50,10 +52,10 @@ main {
     width: 70%;
     display: grid;
     grid-template-columns: 1fr;
-    grid-template-rows: 1fr 1fr 5rem;
+    grid-template-rows: 1fr 2rem 1fr 5rem;
     justify-content: center;
     align-items: center;
-  }
+}
 
 .modal-container {
     height: 100vh;
@@ -63,6 +65,44 @@ main {
     z-index: 999;
     top: 0;
     left: 0;
+    
+}
+
+
+/*                  Background animation                 */
+
+
+@property --angle {
+    syntax: '<angle>';
+    initial-value: 0deg;
+    inherits: false;
+}
+  
+@keyframes rotate-bg {
+    to { --angle: 360deg; }
+}
+
+.bg {
+    position: fixed;
+    width: 100vw;
+    height: 100vh;
+    z-index: -4;
+    top:0;
+    left:0;
+    overflow: hidden;
+    background-image: conic-gradient(
+        from var(--angle),
+        var(--bg-color) 50deg,
+        var(--bg-color-3-blue) 90deg,
+        var(--bg-color) 180deg,
+        var(--bg-color-3-blue) 300deg,
+        var(--bg-color-2-purp)320deg,
+        var(--bg-color) 360deg
+        );
+
+    background-color: black;
+
+    animation: rotate-bg 180s linear infinite;
     
 }
 
@@ -84,7 +124,6 @@ main {
     padding: 2.5rem;
     background-color: var(--window-color-darkblue);
     position: relative;
-    width: 100%;
     border-radius: var(--border-radius-window);
     box-shadow: var(--window-shadows);
     display: flex;
@@ -110,7 +149,7 @@ main {
 .live-search-results {
     position: absolute;
     background-color: var(--accent-color-lighter-greyblue);
-    min-height: 2rem;
+    min-height: 0;
     max-height: 8rem;
     top: 1.6rem;
     z-index: 2;
@@ -266,7 +305,7 @@ main {
 }
 
 
-.input-reset-button {
+.input-reset-button, .form-resubmit-button {
     border: none;
     font-size: 1rem;
     color: var(--font-primary);
@@ -366,6 +405,7 @@ main {
 
 .form-data-display {
     display: grid;
+    position: relative;
     grid-template-columns: 1fr;
     grid-template-rows: 2rem 2rem 125px 3rem;
     width: clamp(15rem, 50%, 20rem);
@@ -441,20 +481,21 @@ main {
     line-height: -1rem;
 }
 
-.form-data-display-container > .input-reset-button {
-    position: absolute;
-    right: 4rem;
-    bottom: 1.5rem;
-}
-
-
-
 
 
 /*                       Output   Results                         */
 
+
+.app-buttons {
+    display: flex;
+    align-items: center;
+    justify-content: space-around;
+    justify-self: center;
+    width: 60%;
+}
+
 .output-results-container {
-    grid-row: 2/4;
+    grid-row: 3/5;
     display: flex;
     align-items: center;
     justify-content: center;

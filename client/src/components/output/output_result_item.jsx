@@ -11,7 +11,7 @@ export function Output_Result_Item({item, index, img}) {
             <div className="output-item-details">
 
                 <div className="output-item-img">
-                    <img src={img} alt="" />
+                    <img src={img} alt={item.outputType === 'artist' ? item.outputArtist : item.outputTitle} />
                 </div>
 
                 <div className="output-item-info">
@@ -26,11 +26,11 @@ export function Output_Result_Item({item, index, img}) {
                             id={'output-item-title'}
                             maxWidth="8rem"/>
                             :
-                            <p id='output-item-title'>{item.outputTitle}</p>
+                            <p style={{fontWeight : 'bold'}} className='output-item-title'>{item.outputTitle}</p>
                         }
 
-                        <p  id='output-item-artist'>{item.outputArtist}</p>
-                        <p  id='output-item-year'>{item.outputYear}</p>
+                        <p  className='output-item-artist'>{item.outputArtist}</p>
+                        <p  className='output-item-year'>{item.outputYear}</p>
                     </>)
 
                     :
@@ -43,7 +43,7 @@ export function Output_Result_Item({item, index, img}) {
                             id={'output-item-artist'}
                             maxWidth="8rem"/>
                             :
-                            <p id='output-item-artist'>{item.outputArtist}</p>
+                            <p className='output-item-artist'>{item.outputArtist}</p>
                         }
 
                         {JSON.parse(item.outputGenres.replace(/'/g, '"'))?.slice(0, 3).map((item, index) => {

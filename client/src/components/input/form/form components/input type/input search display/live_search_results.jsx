@@ -1,4 +1,5 @@
 import { useEffect, useRef } from "react"
+import { motion, AnimatePresence } from "motion/react"
 
 
 export function Live_Search_Results({
@@ -44,25 +45,31 @@ export function Live_Search_Results({
 
 
     return (
-        <div className="live-search-results"
-        ref={windowRef}>
-            {searchResults.map((item, index) => {
-                return (
-                <div className={"search-result-container" 
-                + (selectedIdx == index ? ' search-result-container-selected' : '' )} key={index}>
-                    <p className="search-result" 
-                    onClick={(e) =>{ 
-                        e.stopPropagation()
-                        handleResultClick(item)
+            <motion.div className="live-search-results"
+            ref={windowRef}
+            key={searchType}
+            style={{overflow: 'hidden'}}
+            initial={{height: 0, width: '100%'}}
+            animate={{height: '7rem'}}
+            exit={{height: 0}}
+            layout>
+                {searchResults.map((item, index) => {
+                    return (
+                    <div className={"search-result-container" 
+                    + (selectedIdx == index ? ' search-result-container-selected' : '' )} key={index}>
+                        <p className="search-result" 
+                        onClick={(e) =>{ 
+                            e.stopPropagation()
+                            handleResultClick(item)
+                            }
                         }
-                    }
-                    ref={(node) => {posRef.current[index] = node}}
-                    >
-                    {searchType === 'artist' ? item.name : item.title}
-                    </p>
-                </div>)
-            })}
-        </div>
+                        ref={(node) => {posRef.current[index] = node}}
+                        >
+                        {searchType === 'artist' ? item.name : item.title}
+                        </p>
+                    </div>)
+                })}
+            </motion.div>
     )
 
 }

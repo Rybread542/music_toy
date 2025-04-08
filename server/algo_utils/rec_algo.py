@@ -86,8 +86,6 @@ def recommend(input_data: dict):
     input_pop_val = input_data['input_pop_val']
 
     # Grab ANN output query
-    # query = os.getenv(f'SELECT_ANN_{output_type.upper()}')
-
 
     # get artist id to filter from results, and genre tags
     input_artist_id, tags_string = get_input_tags(input_type, 

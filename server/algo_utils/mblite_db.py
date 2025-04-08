@@ -36,8 +36,8 @@ def db_execute_stmt(query: str, args: tuple):
 
 
 def build_ann_query(output_type, input_artist_id, input_date_range, input_pop_val):
-    ef_search = input_pop_val * 10
-    artist_cutoff = 500000 + (input_pop_val*100000)
+    ef_search = 500 + (input_pop_val * 5)
+    artist_cutoff = 500000 + (input_pop_val*10000)
     limit = 10 + input_pop_val
     date_start, date_end = input_date_range
 

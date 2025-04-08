@@ -2,7 +2,7 @@ import { Input_Search } from "./input search display/input_search";
 import { useEffect, useState, useRef } from "react";
 import { Input_Search_Display } from "./input search display/input_search_display";
 import { Input_Reset_Button } from "./input search display/input_reset_button";
-import { Select } from "@mui/material";
+import { motion } from "motion/react";
 
 export function Input_Type({
     inputType, 
@@ -63,7 +63,7 @@ export function Input_Type({
 
 
     return (
-        <div className="input-type-details">
+        <>
             <div className="input-select-container">
                 
                 {inputStep > 1 &&
@@ -124,6 +124,6 @@ export function Input_Type({
             loading={loading}
             type={inputType}/> 
             }
-        </div>
+        </>
     )
 }

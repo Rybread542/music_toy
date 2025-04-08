@@ -1,9 +1,10 @@
-import { useRef, useState } from "react"
+import { useState } from "react"
 import { Output_Type } from "./form components/output type/output_type"
 import { Form_Steps_Wrapper } from "./form_steps_wrapper"
 import { Input_Type } from "./form components/input type/input_type"
 import { displaySearchCall } from "../../../util/liveSearch"
 import { Output_Options } from "./form components/output options/output_options"
+import { AnimatePresence, motion } from "motion/react"
 
 export function Input_Form({handleFormSubmit, setCurrentFormData}) {
     
@@ -41,7 +42,7 @@ export function Input_Form({handleFormSubmit, setCurrentFormData}) {
         
         setCurrentFormData((prevData) => {
             return {
-                ...formData,
+                formData,
                 displayData: {
                     ...displayData
                     }
@@ -113,42 +114,71 @@ export function Input_Form({handleFormSubmit, setCurrentFormData}) {
     
 
     return (
-        
-        <Form_Steps_Wrapper handleFormSubmit={handleLocalSubmit} 
-        formStep={formStep} 
-        setFormStep={setFormStep}
-        inputStep={inputStep}
-        inputConfirmed={inputConfirmed}>
-            {formStep === 1 &&
-            <Output_Type handleOutputSelect={handleOutputTypeSelect}
-            outputType={outputType}/>}
 
-            {formStep === 2 &&
-            <Input_Type 
-            inputType={inputType}
-            inputArtist={inputArtist}
-            inputTitle={inputTitle}
+            <Form_Steps_Wrapper handleFormSubmit={handleLocalSubmit} 
+            formStep={formStep} 
+            setFormStep={setFormStep}
             inputStep={inputStep}
-            clearInputSearch={clearInputSearch}
-            setInputStep={setInputStep}
-            displayData={displayData}
-            handleInputTypeSelect={handleInputTypeSelect}
-            handleInputSearchChange={handleInputSearchChange}
-            handleInputDisplaySearch={handleInputDisplaySearch}
-            />}
+            inputConfirmed={inputConfirmed}>
 
-            {formStep === 3 &&
-            <Output_Options 
-            comment={inputComment} 
-            setComment={setInputComment}
-            dateRange={dateRange}
-            popVal={popVal}
-            handleDateRangeUpdate={handleDateRangeUpdate}
-            handlePopValUpdate={handlePopValUpdate}
-            outputType={outputType}
-            />}
+                        {formStep === 1 &&
+                        
+                            <motion.div className="output-select-container"
+                            initial= {{opacity: 0}}
+                            animate={{opacity: 1}}
+                            exit={{opacity : 0}}
+                            transition= {{delay: 0.3}}
+                            >
 
-        </Form_Steps_Wrapper>
-        
+                                <Output_Type handleOutputSelect={handleOutputTypeSelect}
+                                outputType={outputType}/>
+
+                            </motion.div>
+                        
+                        }
+
+                        {formStep === 2 &&
+                        
+                            <motion.div className="input-type-details"
+                            initial= {{opacity: 0}}
+                            animate={{opacity: 1}}
+                            exit={{opacity : 0}}
+                            transition= {{delay: 0.3}}
+                            >
+
+                                <Input_Type 
+                                inputType={inputType}
+                                inputArtist={inputArtist}
+                                inputTitle={inputTitle}
+                                inputStep={inputStep}
+                                clearInputSearch={clearInputSearch}
+                                setInputStep={setInputStep}
+                                displayData={displayData}
+                                handleInputTypeSelect={handleInputTypeSelect}
+                                handleInputSearchChange={handleInputSearchChange}
+                                handleInputDisplaySearch={handleInputDisplaySearch}
+                                />
+
+                            </motion.div>
+                        }
+
+                        {formStep === 3 &&
+                        <motion.div className="input-type-details"
+                        initial= {{opacity: 0}}
+                        animate={{opacity: 1}}
+                        exit={{opacity : 0}}
+                        transition= {{delay: 0.3}}
+                        >
+                            <Output_Options 
+                            comment={inputComment} 
+                            setComment={setInputComment}
+                            dateRange={dateRange}
+                            popVal={popVal}
+                            handleDateRangeUpdate={handleDateRangeUpdate}
+                            handlePopValUpdate={handlePopValUpdate}
+                            outputType={outputType}
+                            />
+                        </motion.div>}
+            </Form_Steps_Wrapper>
     )
 }

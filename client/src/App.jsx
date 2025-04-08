@@ -3,6 +3,8 @@ import { Input_Form } from './components/input/form/input_form'
 import { Output_Results } from './components/output/output_results'
 import { Modal_Display } from './components/input/modal/modal_display'
 import { Form_Data_Display } from './components/input/filled form/form_data_display'
+import { Input_Reset_Button } from './components/input/form/form components/input type/input search display/input_reset_button'
+import { Form_Resubmit_Button } from './components/input/form/form_resubmit_button'
 
 function App() {
 
@@ -40,10 +42,15 @@ function App() {
     }
     
     console.log(`response: `, data)
+    if(data.length < 1) {
+      setOutputError('No results!')
+    }
+
     setLoad(false)
 }
 
   const handleStartOver = () => {
+    setLoad(true)
     setSubmitted(false)
     setModalOpen(true)
     setOutputData({})
@@ -51,8 +58,14 @@ function App() {
     
   }
 
+  const handleResubmit = async() => {
+    await handleFormSubmit(currentFormData.formData)
+  }
+
 
   return (
+    <>
+    <div className="bg"></div>
     <main>
       <div className="app-content">
         <Modal_Display isOpen={modalOpen}>
@@ -66,11 +79,19 @@ function App() {
         handleStartOver={handleStartOver}/>
         }
         {!load && submitted && (
+          <>
+            <div className="app-buttons">
+              <Input_Reset_Button handleReset={handleStartOver}/>
+              <Form_Resubmit_Button handleResubmit={handleResubmit}/>
+            </div>
             <Output_Results outputData={outputData} error={outputError}/>
+          </>
           )}
       </div>
     </main>
+    </>
   )
 }
+
 
 export default App

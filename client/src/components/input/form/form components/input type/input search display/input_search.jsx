@@ -2,6 +2,7 @@ import { forwardRef, useEffect, useState } from "react";
 import { Live_Search_Results } from "./live_search_results";
 import { liveSearchCall } from "../../../../../../util/liveSearch";
 import { Input_Search_Confirm_Button } from "./input_search_confirm_button";
+import { AnimatePresence } from "motion/react";
 
 
 export const Input_Search = forwardRef(({
@@ -15,6 +16,7 @@ export const Input_Search = forwardRef(({
 
     const [ searchQuery, setSearchQuery ] = useState('')
     const [ debounceQuery, setDebounceQuery ] = useState('')
+    const [ searchLoad, setSearchLoad ] = useState(false)
 
     const [ searchResults, setSearchResults ] = useState([])
 
@@ -23,6 +25,7 @@ export const Input_Search = forwardRef(({
     //debounce query logic
     useEffect(() => {
         const timer = setTimeout(() => {
+            
             setDebounceQuery(searchQuery)
         }, 300)
 
@@ -30,10 +33,13 @@ export const Input_Search = forwardRef(({
     }, [searchQuery])
 
     useEffect(() => {
+        setSearchLoad(true)
         if (debounceQuery.length < 3) {
+            setSearchLoad(false)
             return
         }
 
+        
         const abort = new AbortController();
             
         async function search() {
@@ -55,9 +61,9 @@ export const Input_Search = forwardRef(({
         }
         
         search();
-
         return () => {
             abort.abort();
+            setSearchLoad(false)
         }
 
     }, [debounceQuery])
@@ -82,6 +88,7 @@ export const Input_Search = forwardRef(({
             if (e.key === 'Enter') {
                 if(searchResults.length > 0) {
                     e.preventDefault()
+                    setSearchLoad(false)
                     setSearchResults([])
                     setSelectedIdx(0)
                     handleInputSearchChange(inputType === 'artist' ? 
@@ -140,14 +147,18 @@ export const Input_Search = forwardRef(({
                     </div>
                 }
 
-            {(searchResults.length > 0 && enabled) &&
-            (<Live_Search_Results 
-            searchResults={searchResults} 
-            searchType={inputType} 
-            handleSearchInputChange={handleInputSearchChange}
-            setSearchResults={setSearchResults}
-            selectedIdx={selectedIdx}
-            />)}
+            <AnimatePresence>
+                {((searchLoad && searchResults.length == 0) || (searchResults.length > 0 && enabled)) &&
+                (
+                    <Live_Search_Results 
+                    searchResults={searchResults} 
+                    searchType={inputType} 
+                    handleSearchInputChange={handleInputSearchChange}
+                    setSearchResults={setSearchResults}
+                    selectedIdx={selectedIdx}
+                    />
+                )}
+            </AnimatePresence>
                 
             </div>
 

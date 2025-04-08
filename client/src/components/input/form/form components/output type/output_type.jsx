@@ -1,9 +1,8 @@
-
+import { motion, AnimatePresence } from "motion/react"
 
 export function Output_Type({handleOutputSelect, outputType}){
 
     return (
-        <div className="output-select-container">
             <div className="output-select">
                 <p>I'm looking for 
                     <span>
@@ -19,6 +18,5 @@ export function Output_Type({handleOutputSelect, outputType}){
                     </span>
                 </p>
             </div>
-        </div>
     )
 }

@@ -29,7 +29,7 @@ export function Input_Search_Display({displayData, loading, type}) {
                             bold={true}
                             id={'search-display-title'}/>)
                             :
-                            <p id="search-display-title">{displayData.resultTitle}</p>
+                            <p style={{fontWeight : 'bold'}} id="search-display-title">{displayData.resultTitle}</p>
                         }
 
                         <p id="search-display-artist">{displayData.resultArtist}</p>
@@ -46,7 +46,7 @@ export function Input_Search_Display({displayData, loading, type}) {
                         bold={true}
                         id={'search-display-artist'}/>)
                         :
-                        <p id="search-display-artist">{displayData.resultArtist}</p>
+                        <p style={{fontWeight : 'bold'}} id="search-display-artist">{displayData.resultArtist}</p>
                     }
 
                     {displayData.resultGenres.length > 0 &&
