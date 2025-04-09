@@ -1,8 +1,9 @@
-import { forwardRef, useEffect, useState } from "react";
+import { forwardRef, useEffect, useState, useRef } from "react";
 import { Live_Search_Results } from "./live_search_results";
 import { liveSearchCall } from "../../../../../../util/liveSearch";
 import { Input_Search_Confirm_Button } from "./input_search_confirm_button";
-import { AnimatePresence } from "motion/react";
+import { AnimatePresence, easeIn, motion } from "motion/react";
+import { Load_Spinner } from "../../../../../misc/load_spinner";
 
 
 export const Input_Search = forwardRef(({
@@ -22,12 +23,17 @@ export const Input_Search = forwardRef(({
 
     const [ selectedIdx, setSelectedIdx ] = useState(0)
 
+    const [height, setHeight] = useState(0)
+
+    const searchContainerRef = useRef(null)
+    const windowRef = useRef(null)
+
     //debounce query logic
     useEffect(() => {
         const timer = setTimeout(() => {
-            
+            setSearchLoad(true)
             setDebounceQuery(searchQuery)
-        }, 300)
+        }, 200)
 
         return () => clearTimeout(timer)
     }, [searchQuery])
@@ -35,6 +41,7 @@ export const Input_Search = forwardRef(({
     useEffect(() => {
         setSearchLoad(true)
         if (debounceQuery.length < 3) {
+            setSearchResults([])
             setSearchLoad(false)
             return
         }
@@ -57,7 +64,11 @@ export const Input_Search = forwardRef(({
                 else {
                     console.log('error fetching: ', e)
                 }
-            }     
+            } 
+            
+            finally {
+                setSearchLoad(false)
+            }
         }
         
         search();
@@ -69,7 +80,6 @@ export const Input_Search = forwardRef(({
     }, [debounceQuery])
 
     const handleSearchUpdate = (e) => {
-        setSearchResults([])
         setSearchQuery(e.target.value)
         handleInputSearchChange(e.target.value, inputType)
     }
@@ -89,7 +99,7 @@ export const Input_Search = forwardRef(({
                 if(searchResults.length > 0) {
                     e.preventDefault()
                     setSearchLoad(false)
-                    setSearchResults([])
+                    setSearchQuery('')
                     setSelectedIdx(0)
                     handleInputSearchChange(inputType === 'artist' ? 
                     searchResults[selectedIdx].name
@@ -123,6 +133,31 @@ export const Input_Search = forwardRef(({
             }
         }
 
+        useEffect(() => {
+            const handleClick = (e) => {
+                setSearchQuery('')
+            }
+    
+            document.addEventListener('click', handleClick)
+    
+            return () => {
+                document.removeEventListener('click', handleClick)
+            }
+        }, [windowRef])
+
+
+
+        useEffect(() => {
+            if (searchContainerRef.current) {
+                const children = searchContainerRef.current.querySelectorAll('div')
+                if (children) {
+                    const newHeight =[...children].reduce((accum, item) => accum + item.offsetHeight, 0)
+                    setHeight(newHeight)
+                }
+                
+            }
+        }, [searchResults])
+
 
     return (
         <>
@@ -148,16 +183,32 @@ export const Input_Search = forwardRef(({
                 }
 
             <AnimatePresence>
-                {((searchLoad && searchResults.length == 0) || (searchResults.length > 0 && enabled)) &&
+                
+                {(searchQuery.length >= 3) &&
                 (
+                <motion.div className="live-search-container"
+                ref={windowRef}
+                key={inputType}
+                initial={{height: 0}}
+                animate={{width: '100%', height: Math.min(height, 200)}}
+                transition={{duration: '0.3', ease: 'easeInOut'}}
+                exit={{height: 0}}
+                layout>
+                    {searchLoad ?
+                    <Load_Spinner width={'30px'} height={'30px'} opacity={'0.5'}/>
+                    :
                     <Live_Search_Results 
                     searchResults={searchResults} 
                     searchType={inputType} 
                     handleSearchInputChange={handleInputSearchChange}
                     setSearchResults={setSearchResults}
+                    setSearchQuery={setSearchQuery}
                     selectedIdx={selectedIdx}
-                    />
+                    ref={searchContainerRef}
+                    />}
+                </motion.div>
                 )}
+                
             </AnimatePresence>
                 
             </div>

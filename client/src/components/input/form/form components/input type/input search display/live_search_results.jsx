@@ -1,17 +1,17 @@
-import { useEffect, useRef } from "react"
-import { motion, AnimatePresence } from "motion/react"
+import { forwardRef, useEffect, useRef } from "react"
 
 
-export function Live_Search_Results({
+export const Live_Search_Results = forwardRef(({
     searchResults,
     setSearchResults,
+    setSearchQuery,
     searchType,
     handleSearchInputChange,
     selectedIdx,
-}) {
+}, ref) => {
 
-
-    const windowRef = useRef(null)
+    
+    
     const posRef = useRef([])
 
     useEffect(() => {
@@ -27,32 +27,18 @@ export function Live_Search_Results({
 
 
     const handleResultClick = (item) => {
-        setSearchResults([])
+        setSearchQuery('')
         handleSearchInputChange(searchType === 'artist' ? item.name : item.title, searchType)
     }
     
-    useEffect(() => {
-        const handleClick = (e) => {
-            setSearchResults([])
-        }
+    
+    
 
-        document.addEventListener('click', handleClick)
-
-        return () => {
-            document.removeEventListener('click', handleClick)
-        }
-    }, [windowRef])
 
 
     return (
-            <motion.div className="live-search-results"
-            ref={windowRef}
-            key={searchType}
-            style={{overflow: 'hidden'}}
-            initial={{height: 0, width: '100%'}}
-            animate={{height: '7rem'}}
-            exit={{height: 0}}
-            layout>
+            <div className="live-search-results"
+            ref={ref}>
                 {searchResults.map((item, index) => {
                     return (
                     <div className={"search-result-container" 
@@ -69,7 +55,7 @@ export function Live_Search_Results({
                         </p>
                     </div>)
                 })}
-            </motion.div>
+            </div>
     )
 
-}
+})

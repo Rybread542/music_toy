@@ -127,7 +127,7 @@ export function Input_Form({handleFormSubmit, setCurrentFormData}) {
                             initial= {{opacity: 0}}
                             animate={{opacity: 1}}
                             exit={{opacity : 0}}
-                            transition= {{delay: 0.3}}
+                            transition= {{delay: 0.4}}
                             >
 
                                 <Output_Type handleOutputSelect={handleOutputTypeSelect}
@@ -143,7 +143,7 @@ export function Input_Form({handleFormSubmit, setCurrentFormData}) {
                             initial= {{opacity: 0}}
                             animate={{opacity: 1}}
                             exit={{opacity : 0}}
-                            transition= {{delay: 0.3}}
+                            transition= {{delay: 0.4}}
                             >
 
                                 <Input_Type 

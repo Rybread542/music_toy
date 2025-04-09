@@ -31,15 +31,18 @@ export async function liveSearch (type, artist, q) {
     if (type === 'artist') {
         results = await db`
             SELECT
-                artist.name
-            
+                artist.name,
+                similarity(artist.name_search, ${q}) sim
+
             FROM
                 artist
             
-            where artist.name_search LIKE ${q + '%'}
+            where artist.name_search % ${q}
             
             group by artist.name, artist.id
-            order by artist.id asc     
+            order by sim desc,   
+            artist.id asc
+              
             
             LIMIT 20;`
     }
@@ -61,10 +64,9 @@ export async function liveSearch (type, artist, q) {
             
             WHERE
                 artist.id != 1
+                AND artist.name_search = ${artist}
                 AND ${db(type)}.title_search LIKE ${q + '%'}
-                AND artist.name_search LIKE ${artist + '%'}
                 ${type === 'album' ? nukeSingles : db``}
-            
 
             GROUP BY
             ${db(type)}.title, ${db(type)}.id, artist.id, artist.name
