@@ -155,8 +155,8 @@ export async function findLinks(musicObj, spotAuthToken) {
     let {spotLink, artistPhoto} = await getSpotifyLink(outputType, outputArtist, outputTitle, spotAuthToken)
     if (spotLink && spotLink.error) {
                 if (spotLink.error.status === 401) {
-                    spotAuthToken = await spotifyGetAccessToken()
-                    ({spotLink, artistPhoto} = await getSpotifyLink(outputType, outputArtist, outputTitle, spotAuthToken))
+                    newToken = await spotifyGetAccessToken()
+                    ({spotLink, artistPhoto} = await getSpotifyLink(outputType, outputArtist, outputTitle, newToken))
                 }
 
                 else {

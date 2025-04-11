@@ -1,8 +1,13 @@
-import { useMemo } from "react"
+import { useEffect, useMemo } from "react"
 import { Marquee_Text } from "../../misc/marquee_text"
+import { motion, AnimatePresence, useReducedMotion, useAnimate } from 'motion/react'
 
 
 export function Form_Data_Display({formData}) {
+
+    const reduceMotion = useReducedMotion()
+
+    const [scope, animate ] = useAnimate()
 
     const rangeLabel = useMemo(() => {
         const [ dateStart, dateEnd ] = formData.formData.dateRange
@@ -11,9 +16,66 @@ export function Form_Data_Display({formData}) {
         return (start === '<1940' && end === '2020+') ? 'All' : `${start} - ${end}`
     }, [formData.formData.dateRange])
 
+    
+
+    const driftAnimation = reduceMotion ? 
+    {}
+    :
+    {
+        rotateX: [0, -6, 0, -6, 0, 6],
+        rotateY: [0, 6, 0, -6, 0, 6],
+        transition: {
+            duration: 30,
+            ease: 'easeIn',
+            repeat: Infinity,
+            repeatType: 'mirror',
+            delay: 2
+        },
+        times: [0, .25, .5, .75, 1]
+    }
+
+    async function animateSeq() {
+        await animate(scope.current, 
+            {
+                opacity: 1
+            },
+            {
+                duration: 2, 
+                delay: 2.75
+            }
+        )
+
+        await animate(scope.current,
+            {
+                rotateX: [0, -6, -6, 6, 6],
+                rotateY: [0, 6, -6, 6, -6],
+                times: [0, .25, .5, .75, 1]
+            },
+            {
+                duration: 25,
+                ease: 'easeIn',
+                repeat: Infinity,
+                repeatType: 'mirror',
+                delay: 2
+            },
+
+        )
+    }
+
+    useEffect(() =>{
+        animateSeq()
+    }, [])
+
     return (
 
-        <div className="form-data-display-container">
+        <motion.div className="form-data-display-container"
+        ref={scope}
+        initial={{opacity: 0}}
+        style={{
+            willChange: 'transform', 
+            transformPerspective: 800, 
+            }}>
+
             <div className="form-data-display">
 
                 <div className="form-display-output-type">
@@ -84,7 +146,7 @@ export function Form_Data_Display({formData}) {
             </div>
 
             
-        </div>
+        </motion.div>
     )
 
 }

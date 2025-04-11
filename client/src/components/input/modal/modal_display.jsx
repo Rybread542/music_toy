@@ -1,16 +1,17 @@
 import { createPortal } from "react-dom";
+import { motion, AnimatePresence } from 'motion/react'
 
 
-export function Modal_Display({isOpen, children}) {
-
-    if (!isOpen) {
-        return null
-    }
+export function Modal_Display({children}) {
 
     return createPortal(
-        <div className="modal-container">
+        <motion.div className="modal-container"
+        initial={{opacity: 0}}
+        animate={{opacity: 1}}
+        exit={{opacity: 0}}
+        transition={{delay: 1, duration: 0.75, ease: 'easeIn'}}>
             {children}
-        </div>,
+        </motion.div>,
         document.body
     )
 }

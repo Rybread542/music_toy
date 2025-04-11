@@ -62,10 +62,11 @@ main {
     width: 100vw;
     background-color: var(--modal-grey);
     position: fixed;
+    display: flex;
+    justify-content: center;
     z-index: 999;
     top: 0;
     left: 0;
-    
 }
 
 
@@ -114,32 +115,36 @@ main {
 
 
 .input-form-container {
-    position: absolute;
-    top: 30%;
-    left: 50%;
-    transform: translate(-50%, -50%);
+    position: fixed;
+    top: 20%;
+    border-radius: var(--border-radius-window);
+    box-shadow: var(--window-shadows);
+    background-color: var(--window-color-darkblue);
+    padding: 2rem;
+    height: auto;
+    width: auto;
 }
 
 .input-form-modal {
-    padding: 2.5rem;
-    background-color: var(--window-color-darkblue);
-    position: relative;
-    border-radius: var(--border-radius-window);
-    box-shadow: var(--window-shadows);
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
+    height: auto;
+    width: auto;
 }
 
 .input-type-details {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    gap: 0.55rem;
-    position: relative;
+    display: grid;
     margin-top: -1rem;
-    height: clamp(10rem, 20vh, 30rem);
+    grid-template-columns: 1fr;
+    position: relative;
+}
+
+.input-type-inputs {
+    display: grid;
+    grid-template-columns: 1fr;
+    align-content: center;
+    justify-items: center;
+    gap: 0.5rem;
+    height: 100%;
+    padding: 1rem;
 }
 
 .input-search-container {
@@ -180,19 +185,20 @@ main {
     position: absolute;
     right: -1.7rem;
     z-index: 0;
-    bottom: 0.08rem;
+    bottom: 0.05rem;
 }
 
 
 .input-search-display {
     display: flex;
-    width: clamp(11rem, 100%, 25rem);
-    padding: 0.25rem 0.5rem;
+    padding: 0.5rem 0.75rem;
+    background-color: var(--accent-color-lighter-greyblue);
     border-radius: var(--border-radius-window);
     box-shadow: 1px 3px 10px 1px var(--accent-color-greyblue);
+    width: clamp(12rem, 30vw, 15rem);
     justify-content: space-between;
     align-items: center;
-    background-color: var(--accent-color-lighter-greyblue);
+    
 }
 
 .search-display-title, .search-display-title {
@@ -200,7 +206,7 @@ main {
 }
 
 .search-display-img {
-    width: 75px;
+    width: 100px;
     aspect-ratio: 1 / 1;
     display: flex;
 }
@@ -208,10 +214,11 @@ main {
 .search-display-img img {
     max-width: 100%;
     max-height: 100%;
+    border-radius: var(--border-radius-window);
 }
 
 .search-display-info {
-    font-size: 0.65rem;
+    font-size: 1rem;
     text-align: right;
 }
 

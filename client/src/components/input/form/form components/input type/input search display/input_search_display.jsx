@@ -1,19 +1,22 @@
-import { Marquee_Text } from "../../../../../misc/marquee_text"
+import { Load_Spinner } from "../../../../../misc/load_spinner";
+import { Marquee_Text } from "../../../../../misc/marquee_text";
+import { motion } from "motion/react";
 
 
 export function Input_Search_Display({displayData, loading, type}) {
 
     if(loading) {
         return ( 
-        <div className="input-search-delay">
-            <p>loading...</p>
-        </div>
+        <Load_Spinner width={'30px'} height={'30px'} opacity={'0.7'}/>
         )
     }
 
     return (
 
-        <div className="input-search-display">
+        <motion.div className="input-search-display"
+            initial={{opacity: 0}}
+            animate={{opacity: 1}}
+            transition={{delay: 0.3}}>
             <div className="search-display-img">
                 <img src={displayData.resultImg ? displayData.resultImg : 'album-art-default.png'} alt="" />
             </div>
@@ -56,6 +59,6 @@ export function Input_Search_Display({displayData, loading, type}) {
                 </>)
                 }
             </div>
-        </div>
+        </motion.div>
     )
 }

@@ -16,6 +16,11 @@ let spotifyAuthToken
     console.log(`token: ${spotifyAuthToken}`)
 })()
 
+setInterval(async () => {
+    spotifyAuthToken = await spotifyGetAccessToken()
+    console.log(`token refreshed: ${spotifyAuthToken}`)
+}, 3555555)
+
 
 app.use(json())
 

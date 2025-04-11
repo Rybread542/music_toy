@@ -2,7 +2,7 @@ import { forwardRef, useEffect, useState, useRef } from "react";
 import { Live_Search_Results } from "./live_search_results";
 import { liveSearchCall } from "../../../../../../util/liveSearch";
 import { Input_Search_Confirm_Button } from "./input_search_confirm_button";
-import { AnimatePresence, easeIn, motion } from "motion/react";
+import { AnimatePresence, motion } from "motion/react";
 import { Load_Spinner } from "../../../../../misc/load_spinner";
 
 
@@ -27,6 +27,8 @@ export const Input_Search = forwardRef(({
 
     const searchContainerRef = useRef(null)
     const windowRef = useRef(null)
+
+    const inputStr = inputType === 'artist' ? inputArtist : inputTitle
 
     //debounce query logic
     useEffect(() => {
@@ -84,15 +86,6 @@ export const Input_Search = forwardRef(({
         handleInputSearchChange(e.target.value, inputType)
     }
 
-    const confirmButtonVisible = () => {
-        return inputType === 'artist' ? 
-        (inputArtist.length > 0)
-        :
-        (inputTitle.length > 0)
-    }
-
-
-
     // live result keyboard nav
     const handleResultSelect = (e) => {
             if (e.key === 'Enter') {
@@ -108,6 +101,7 @@ export const Input_Search = forwardRef(({
                 }
                 
                 else {
+                    setSearchQuery('')
                     handleConfirmClick()
                 }
             }
@@ -151,7 +145,7 @@ export const Input_Search = forwardRef(({
             if (searchContainerRef.current) {
                 const children = searchContainerRef.current.querySelectorAll('div')
                 if (children) {
-                    const newHeight =[...children].reduce((accum, item) => accum + item.offsetHeight, 0)
+                    const newHeight = [...children].reduce((accum, item) => accum + item.offsetHeight, 0)
                     setHeight(newHeight)
                 }
                 
@@ -161,9 +155,12 @@ export const Input_Search = forwardRef(({
 
     return (
         <>
-            <div className="input-search-container">
+            <motion.div className={"input-search-container"}
+            initial={{opacity: 0}}
+            animate={{opacity: 1}}
+            exit={{opacity: 0}}>
             
-                <input
+                <motion.input
                 type="text"
                 className="form-text-input"
                 placeholder={inputType === 'artist' ? 'Artist' : 'Title'}
@@ -173,47 +170,53 @@ export const Input_Search = forwardRef(({
                 disabled={!enabled}
                 ref={ref}
                 onKeyDown={handleResultSelect}
+                layout
                 />
                 
+                <AnimatePresence>     
+                    {(enabled && inputStr.length > 0) &&
+                        <motion.div className="input-search-confirm-container"
+                        initial={{scale: 0, pointerEvents: 'none'}}
+                        animate={{scale : 1, pointerEvents: 'auto'}}
+                        exit={{scale: 0, pointerEvents: 'none'}}
+                        transition={{duration: '0.2', ease: 'easeInOut'}}
+                        layout>
+                            <Input_Search_Confirm_Button 
+                            handleConfirmClick={handleConfirmClick}/>
+                        </motion.div>
+                    }
+                </AnimatePresence>  
+
+                <AnimatePresence>
                     
-                {(enabled && confirmButtonVisible()) &&
-                    <div className="input-search-confirm-container">
-                        <Input_Search_Confirm_Button handleConfirmClick={handleConfirmClick}/>
-                    </div>
-                }
+                    {(searchQuery.length >= 3) &&
+                    (
+                    <motion.div className="live-search-container"
+                    ref={windowRef}
+                    key={inputType}
+                    initial={{height: 0}}
+                    animate={{width: '100%', height: Math.min(height, 200)}}
+                    transition={{duration: '0.3', ease: 'easeInOut'}}
+                    exit={{height: 0}}
+                    layout>
+                        {searchLoad ?
+                        <Load_Spinner width={'30px'} height={'30px'} opacity={'0.5'}/>
+                        :
+                        <Live_Search_Results 
+                        searchResults={searchResults} 
+                        searchType={inputType} 
+                        handleSearchInputChange={handleInputSearchChange}
+                        setSearchResults={setSearchResults}
+                        setSearchQuery={setSearchQuery}
+                        selectedIdx={selectedIdx}
+                        ref={searchContainerRef}
+                        />}
+                    </motion.div>
+                    )}
 
-            <AnimatePresence>
+                </AnimatePresence>
                 
-                {(searchQuery.length >= 3) &&
-                (
-                <motion.div className="live-search-container"
-                ref={windowRef}
-                key={inputType}
-                initial={{height: 0}}
-                animate={{width: '100%', height: Math.min(height, 200)}}
-                transition={{duration: '0.3', ease: 'easeInOut'}}
-                exit={{height: 0}}
-                layout>
-                    {searchLoad ?
-                    <Load_Spinner width={'30px'} height={'30px'} opacity={'0.5'}/>
-                    :
-                    <Live_Search_Results 
-                    searchResults={searchResults} 
-                    searchType={inputType} 
-                    handleSearchInputChange={handleInputSearchChange}
-                    setSearchResults={setSearchResults}
-                    setSearchQuery={setSearchQuery}
-                    selectedIdx={selectedIdx}
-                    ref={searchContainerRef}
-                    />}
-                </motion.div>
-                )}
-                
-            </AnimatePresence>
-                
-            </div>
-
-            
+            </motion.div>
         </>
     )
 })

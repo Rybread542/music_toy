@@ -21,6 +21,7 @@ export function Input_Form({handleFormSubmit, setCurrentFormData}) {
     const [ inputStep, setInputStep ] = useState(1)
     const [ displayData, setDisplayData ] = useState(null)
     const [ inputConfirmed, setInputConfirmed ] = useState(false)
+    const [ mountKey, setMountKey ] = useState(0)
 
     // output options state
     const [ dateRange, setDateRange ] = useState([1930, 2030])
@@ -137,33 +138,32 @@ export function Input_Form({handleFormSubmit, setCurrentFormData}) {
                         
                         }
 
-                        {formStep === 2 &&
-                        
-                            <motion.div className="input-type-details"
-                            initial= {{opacity: 0}}
-                            animate={{opacity: 1}}
-                            exit={{opacity : 0}}
-                            transition= {{delay: 0.4}}
-                            >
+                            {formStep === 2 &&
+                                <motion.div className="input-type-details"
+                                initial= {{opacity: 0}}
+                                animate={{opacity: 1}}
+                                transition= {{delay: 0.4}}
+                                key={mountKey} 
+                                >
+                                    <Input_Type
+                                    setMountKey={setMountKey}
+                                    inputType={inputType}
+                                    inputArtist={inputArtist}
+                                    inputTitle={inputTitle}
+                                    inputStep={inputStep}
+                                    clearInputSearch={clearInputSearch}
+                                    setInputStep={setInputStep}
+                                    displayData={displayData}
+                                    handleInputTypeSelect={handleInputTypeSelect}
+                                    handleInputSearchChange={handleInputSearchChange}
+                                    handleInputDisplaySearch={handleInputDisplaySearch}
+                                    />
 
-                                <Input_Type 
-                                inputType={inputType}
-                                inputArtist={inputArtist}
-                                inputTitle={inputTitle}
-                                inputStep={inputStep}
-                                clearInputSearch={clearInputSearch}
-                                setInputStep={setInputStep}
-                                displayData={displayData}
-                                handleInputTypeSelect={handleInputTypeSelect}
-                                handleInputSearchChange={handleInputSearchChange}
-                                handleInputDisplaySearch={handleInputDisplaySearch}
-                                />
-
-                            </motion.div>
-                        }
+                                </motion.div>
+                            }
 
                         {formStep === 3 &&
-                        <motion.div className="input-type-details"
+                        <motion.div className="input-options"
                         initial= {{opacity: 0}}
                         animate={{opacity: 1}}
                         exit={{opacity : 0}}
