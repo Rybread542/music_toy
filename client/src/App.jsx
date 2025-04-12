@@ -24,28 +24,28 @@ function App() {
     setOutputData({})
     
   
-    // const response = await fetch('/api/ai', {
-    //     method : 'POST',
-    //     headers : { 'Content-Type' : 'application/json' },
-    //     body : JSON.stringify({ 
-    //         inputData
-    //      })
-    // })
+    const response = await fetch('/api/ai', {
+        method : 'POST',
+        headers : { 'Content-Type' : 'application/json' },
+        body : JSON.stringify({ 
+            inputData
+         })
+    })
     
-    // console.log(response)
-    // const data = await response.json()
-    // if ('error' in data) {
-    //   setOutputError(data.error)
-    // }
+    console.log(response)
+    const data = await response.json()
+    if ('error' in data) {
+      setOutputError(data.error)
+    }
 
-    // else {
-    //   setOutputData(data)
-    // }
+    else {
+      setOutputData(data)
+    }
     
-    // console.log(`response: `, data)
-    // if(data.length < 1) {
-    //   setOutputError('No results!')
-    // }
+    console.log(`response: `, data)
+    if(data.length < 1) {
+      setOutputError('No results!')
+    }
 
     setLoad(false)
 }
@@ -85,7 +85,7 @@ function App() {
         handleStartOver={handleStartOver}/>
         }
 
-        {/* {!load && submitted && (
+        {!load && submitted && (
           <>
             <div className="app-buttons">
               <Input_Reset_Button handleReset={handleStartOver}/>
@@ -93,7 +93,7 @@ function App() {
             </div>
             <Output_Results outputData={outputData} error={outputError}/>
           </>
-          )} */}
+          )}
       </div>
     </main>
     </>

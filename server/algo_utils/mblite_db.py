@@ -26,6 +26,7 @@ def get_db_cursor():
 def db_execute_stmt(query: str, args: tuple):
     cursor = get_db_cursor()
     try:
+        logger.info(f'RUNNING QUERY:\n{query} WITH ARGS \n {args}')
         cursor.execute(query, args)
         data = cursor.fetchall()
         logger.info(f'DATA FOR THIS DB CALL: {data}')

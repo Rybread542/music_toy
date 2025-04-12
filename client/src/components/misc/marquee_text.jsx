@@ -7,7 +7,7 @@ export function Marquee_Text({text, maxWidth='5rem', bold, id}) {
         style={{maxWidth, overflow : 'hidden'}}>
             <Marquee 
             pauseOnClick={true}
-            delay={4}
+            delay={3}
             speed={15}
             >
                 <p style={bold? {fontWeight : 'bold'} : {}}
