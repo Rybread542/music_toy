@@ -68,10 +68,13 @@ export function Form_Steps_Wrapper ({children,
                             transition={{delay: 0.8}}
                             exit={{opacity: 0, transition: {duration: 0}}}
                             key={'submit'}>
-                                <button className='form-submit-button' 
-                                onClick={handleFormSubmit}>
+                                <motion.button className='form-submit-button' 
+                                onClick={handleFormSubmit}
+                                whileHover={{scale: 1.02, 
+                                color: 'var(--accent-color-confirm-green)',
+                                background: 'radial-gradient(circle at center, var(--font-primary), var(--accent-color-confirm-green) 100%)'}}>
                                     <i className="fa-solid fa-play"></i>
-                                </button>
+                                </motion.button>
                             </motion.div>
                             )
                         }

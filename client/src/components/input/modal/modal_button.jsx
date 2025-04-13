@@ -11,6 +11,10 @@ export function Modal_Button({direction, handleButtonClick}) {
         exit={{opacity: 0, transition: {duration: 0}}}>
             <motion.button type="button" onClick={handleButtonClick} 
             className="modal-button"
+            whileHover={{backgroundColor: 'var(--accent-color-lighter-greyblue-highlight)',
+                color: 'var(--font-secondary-dark)'
+            }}
+            whileTap={{y: 2}}
             layout>
                 {direction === 'next' ? 
                 (<i className="fa-solid fa-arrow-right-long"></i>)

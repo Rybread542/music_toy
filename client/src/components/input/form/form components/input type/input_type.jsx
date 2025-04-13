@@ -71,13 +71,7 @@ export function Input_Type({
 
                     <AnimatePresence>
                         {inputStep > 1 &&
-                        <motion.div className="input-reset-button-container"
-                        initial={{scale: 0, pointerEvents: 'none'}}
-                        animate={{scale : 1, pointerEvents: 'auto'}}
-                        exit={{scale: 0, pointerEvents: 'none'}}
-                        layout>
                             <Input_Reset_Button handleReset={handleResetClick} />
-                        </motion.div>
                         }
                     </AnimatePresence>
 

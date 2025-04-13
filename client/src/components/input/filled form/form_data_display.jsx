@@ -49,14 +49,14 @@ export function Form_Data_Display({formData}) {
             {
                 rotateX: [0, -6, -6, 6, 6],
                 rotateY: [0, 6, -6, 6, -6],
-                times: [0, .25, .5, .75, 1]
             },
             {
                 duration: 25,
                 ease: 'easeIn',
                 repeat: Infinity,
                 repeatType: 'mirror',
-                delay: 2
+                delay: 2,
+                times: [0, .25, .5, .75, 1]
             },
 
         )
@@ -74,7 +74,9 @@ export function Form_Data_Display({formData}) {
         style={{
             willChange: 'transform', 
             transformPerspective: 800, 
-            }}>
+            }}
+        exit= {{scale: 0, y:1000, transition: {duration: 1, ease: [0.35, 0, 0.65, 0.35]}}}
+            >
 
             <div className="form-data-display">
 

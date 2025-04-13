@@ -3,9 +3,9 @@ import { Input_Form } from './components/input/form/input_form'
 import { Output_Results } from './components/output/output_results'
 import { Modal_Display } from './components/input/modal/modal_display'
 import { Form_Data_Display } from './components/input/filled form/form_data_display'
-import { Input_Reset_Button } from './components/input/form/form components/input type/input search display/input_reset_button'
-import { Form_Resubmit_Button } from './components/input/form/form_resubmit_button'
-import { AnimatePresence, useTransform, useMotionValue } from 'motion/react'
+import { Output_Loading } from './components/output/output_loading'
+import { Output_Controls } from './components/output/output_controls'
+import { AnimatePresence } from 'motion/react'
 
 function App() {
 
@@ -51,11 +51,10 @@ function App() {
 }
 
   const handleStartOver = () => {
-    setLoad(true)
     setSubmitted(false)
-    setModalOpen(true)
-    setOutputData({})
     setOutputError('')
+    setModalOpen(true)
+    setOutputData([])
     
   }
 
@@ -71,29 +70,46 @@ function App() {
       <div className="app-content">
         <AnimatePresence>
           {modalOpen &&
-            <Modal_Display isOpen={modalOpen}>
+            <Modal_Display isOpen={modalOpen}
+            key={'modal-display'}>
               <Input_Form
               handleFormSubmit={handleFormSubmit}
               setCurrentFormData={setCurrentFormData}/>
             </Modal_Display>
           }
-        </AnimatePresence>
 
-        {submitted &&
-        <Form_Data_Display formData={currentFormData}
-        load={load}
-        handleStartOver={handleStartOver}/>
-        }
+
+  
+          {submitted &&
+          <Form_Data_Display formData={currentFormData}
+          load={load}
+          handleStartOver={handleStartOver}
+          key={'form-display'}/>
+          }
+   
+
+    
+          {submitted && load &&
+            <Output_Loading
+            key={'output-loading'}/>
+          }
+      
 
         {!load && submitted && (
           <>
-            <div className="app-buttons">
-              <Input_Reset_Button handleReset={handleStartOver}/>
-              <Form_Resubmit_Button handleResubmit={handleResubmit}/>
-            </div>
-            <Output_Results outputData={outputData} error={outputError}/>
+
+            <Output_Controls 
+            key={'output-controls'}
+            handleResubmit={handleResubmit}
+            handleStartOver={handleStartOver}/>
+
+            <Output_Results outputData={outputData} error={outputError}
+            key={'output-results-co'}/>
+
           </>
           )}
+        </AnimatePresence>
+          
       </div>
     </main>
     </>

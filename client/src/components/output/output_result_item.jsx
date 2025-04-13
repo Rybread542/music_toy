@@ -64,6 +64,10 @@ export function Output_Result_Item({item, index, img}) {
         tap: {opacity: 1},
     }
 
+    const imageError = (e) => {
+        e.target.src = `/images/${item.outputType === 'artist' ? 'artist-photo-default.png' : 'album-art-default.png'}`
+    }
+
 
     return (
             
@@ -82,7 +86,9 @@ export function Output_Result_Item({item, index, img}) {
             >
                 <div className="output-item-details">
                     <motion.div className="output-item-img" variants={imgVariants}>
-                        <img src={img} alt={item.outputType === 'artist' ? item.outputArtist : item.outputTitle} />
+                        <img src={img ? img : item.outputType === 'artist' ? '/images/artist-photo-default.png' : '/images/album-art-default.png'} 
+                        alt={item.outputType === 'artist' ? item.outputArtist : item.outputTitle} 
+                        onError={imageError}/>
                     </motion.div>
                     <motion.div className="output-item-info"
                     initial={{bottom: 0, left: 0, opacity: 0}}
