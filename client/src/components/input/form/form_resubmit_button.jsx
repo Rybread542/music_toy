@@ -12,7 +12,7 @@ export function Form_Resubmit_Button({handleResubmit}) {
         layout>
             <button type="button" onClick={handleResubmit}
             className={"form-resubmit-button"}
-            >
+            title='Resubmit'>
                 <i className="fa-solid fa-arrows-rotate"></i>
             </button>
         </motion.div>

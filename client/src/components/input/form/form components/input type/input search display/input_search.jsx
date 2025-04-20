@@ -1,6 +1,6 @@
 import { forwardRef, useEffect, useState, useRef } from "react";
 import { Live_Search_Results } from "./live_search_results";
-import { liveSearchCall } from "../../../../../../util/liveSearch";
+import { liveSearchCall } from "../../../../../../util/apiSearch";
 import { Input_Search_Confirm_Button } from "./input_search_confirm_button";
 import { AnimatePresence, motion } from "motion/react";
 import { Load_Spinner } from "../../../../../misc/load_spinner";
@@ -101,8 +101,10 @@ export const Input_Search = forwardRef(({
                 }
                 
                 else {
-                    setSearchQuery('')
-                    handleConfirmClick()
+                    if(e.target.value.length > 0) {
+                        handleConfirmClick()
+                        setSearchQuery('')
+                    }
                 }
             }
 

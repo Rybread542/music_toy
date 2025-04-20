@@ -1,5 +1,7 @@
 import { Slider } from '@mui/material'
 import { motion, AnimatePresence } from 'motion/react'
+import { Tooltip } from '../../../../misc/tooltip'
+import { AINoteTooltip, varietyTooltip } from '../../../../../util/config'
 
 
 
@@ -38,7 +40,13 @@ export function Output_Options({
         <AnimatePresence propagate>
             <motion.div className="output-options-container"
                 exit={{opacity: 0}}>
+                    
                 <div className="output-options-comment">
+                    
+                    <div className="output-options-comment-label">
+                        <h4>Details </h4>
+                        <Tooltip text={AINoteTooltip}/>
+                    </div>
                     <motion.textarea
                         className='form-textarea'
                         placeholder="Additional details..."
@@ -46,6 +54,7 @@ export function Output_Options({
                         onChange={(e) => setComment(e.target.value)}
                         layout
                     />
+                    
                 </div>
             
                 <motion.div className="output-options-sliders"
@@ -77,10 +86,17 @@ export function Output_Options({
                 }
 
                     <div className="output-options-variety">
-                        <div className="output-options-variety-label">
-                            <p>Variety</p>
-                            <p className="variety-label">{popVal}</p>
+                        <div className="output-options-variety-container">
+                            <div className="output-options-variety-label">
+                                <p>Variety </p>
+                                <Tooltip text={varietyTooltip}/>
+                            </div>
+
+                            <div className="output options-variety">
+                                <p className="variety-label">{popVal}</p>
+                            </div>
                         </div>
+                        
                         <Slider
                             size='small'
                             className='output-options-slider'
@@ -89,6 +105,7 @@ export function Output_Options({
                             valueLabelDisplay='off'
                             sx={{color: 'var(--accent-color-lighter-greyblue)'}}
                         />
+                        
                     </div>
                 </motion.div>
             </motion.div>

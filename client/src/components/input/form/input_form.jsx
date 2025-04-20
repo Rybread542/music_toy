@@ -2,7 +2,7 @@ import { useState } from "react"
 import { Output_Type } from "./form components/output type/output_type"
 import { Form_Steps_Wrapper } from "./form_steps_wrapper"
 import { Input_Type } from "./form components/input type/input_type"
-import { displaySearchCall } from "../../../util/liveSearch"
+import { displaySearchCall } from "../../../util/apiSearch"
 import { Output_Options } from "./form components/output options/output_options"
 import { AnimatePresence, motion } from "motion/react"
 
@@ -89,9 +89,14 @@ export function Input_Form({handleFormSubmit, setCurrentFormData}) {
     const handleInputDisplaySearch = async () => {
         const searchQuery = {inputType, inputArtist, inputTitle}
         const data = await displaySearchCall(searchQuery)
-        console.log(data)
         setDisplayData(data)
-        setInputConfirmed(true)
+        
+        if (data.resultArtist) {
+            setInputArtist(data.resultArtist)
+            setInputTitle(data.resultTitle)
+            setInputConfirmed(true)
+        }
+        
     }
 
 

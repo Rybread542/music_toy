@@ -1,22 +1,22 @@
+import { useState, memo } from "react"
+import { useWindowDimensions } from "../../hooks/windowDimensions"
 import { Output_Result_Item } from "./output_result_item"
 import { AnimatePresence, motion } from "motion/react"
+import { Output_Cycle_Button } from "./output_cycle_button"
 
 export function Output_Results({outputData, error}) {
 
-    const imgUrl = (item) => {
-        if (item.outputType === 'artist') {
-            return item.artistPhoto ?
-            item.artistPhoto 
-            :
-            'artist-photo-default.png'
-        }
+    const [ width, height ] = useWindowDimensions()
+    const smallWidth = width <= 700
+    const smallHeight = height <= 900
+    const [ stackIndexes, setStackIndexes ] = useState([1, 2, 3])
+    const [ cycleToken, setCycleToken ] = useState(0)
 
-        else {
-            return item.albumArt ? 
-            item.albumArt 
-            :
-            'album-art-default.png'
-        }
+    const cycleStack = () => {
+        setCycleToken(t => t+1)
+        setStackIndexes((prev) => {
+            return prev.map((x) => x === 3 ? 1 : x + 1)
+        })
     }
 
     const componentVariants = {
@@ -25,11 +25,6 @@ export function Output_Results({outputData, error}) {
         exit: {transition: {staggerChildren: 0.2}}
     }
 
-    const itemVariants = {
-        initial: {scale: 0, position: 'absolute', top: -100},
-        rest: {scale: 1, top: 0, position: 'static', transition: {duration: 0.75}},
-        exit: {scale: 0, y:1000, transition: {duration: 1, ease: [0.35, 0, 0.65, 0.35]}}
-    }
     
     return (
         <motion.div className="output-results-container"
@@ -44,27 +39,69 @@ export function Output_Results({outputData, error}) {
                 exit='exit'>
 
                     {error && (
-                        <div className="error-container">
+                        <motion.div className="error-container"
+                        initial={{opacity: 0}}
+                        animate={{opacity: 1}}
+                        exit={{opacity: 0}}>
                             <p>{error}</p>
-                        </div>
+                        </motion.div>
                     )}
 
-                    {outputData?.map((item, index) => {
-                        const img = imgUrl(item)
-                        
+                    
+                    {outputData.length > 0 &&
+                    
+                    outputData.map((item, index) => {
+
+                        const stackedView = {
+                            position: 'absolute',
+                            zIndex: stackIndexes[index],
+                            y: `calc(-50% + ${index*18}px)`,
+                            top: smallHeight ? '25%':'50%',
+                            left: '50%'
+                        }
+
+
                         return (
-                        <motion.div key={item.id} 
-                        variants={itemVariants}
-                        >
-                            <Output_Result_Item
-                                    item={item}
-                                    index={index}
-                                    img={img}
-                                    />
-                        </motion.div>
+                        
+                            <motion.div key={item.outputArtist} 
+                            variants={
+                                {
+                                    initial: {scale: 0},
+                                    rest: {
+                                        scale: 1, 
+                                        x: smallWidth ? '-50%': 0, 
+                                        y: smallWidth ? `calc(-50% + ${stackIndexes[index]*18}px)`: 0, 
+                                        transition: {duration: 0.3, ease: 'easeOut'}
+                                    },
+                                    exit: {
+                                        scale: 0, 
+                                        y:1000, 
+                                        transition: {duration: 1, ease: [0.35, 0, 0.65, 0.35]}}
+                                }
+                            }
+
+                            style={smallWidth ? stackedView : {zIndex: 3}}
+                            >
+                                <Output_Result_Item 
+                                item={item} 
+                                index={index} 
+                                img={item.outputType === 'artist' ? item.artistPhoto : item.albumArt}
+                                token={cycleToken}
+                                front={smallWidth ? stackIndexes[index] === 3 : true} 
+                                />
+
+                            </motion.div>
+                        
                         )
                         
                     })}
+                
+                <AnimatePresence>
+                    {smallWidth &&
+                        <Output_Cycle_Button onClick={cycleStack}/>
+                    }
+                </AnimatePresence>
+
                 </motion.div>
         </motion.div>
     )

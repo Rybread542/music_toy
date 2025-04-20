@@ -6,6 +6,9 @@ import { Form_Data_Display } from './components/input/filled form/form_data_disp
 import { Output_Loading } from './components/output/output_loading'
 import { Output_Controls } from './components/output/output_controls'
 import { AnimatePresence } from 'motion/react'
+import { recommendSearchCall } from './util/apiSearch'
+import { Header } from './components/misc/header/header'
+import { Header_Info } from './components/misc/header/header_info'
 
 function App() {
 
@@ -23,17 +26,8 @@ function App() {
     setOutputError('')
     setOutputData({})
     
+    const data = await recommendSearchCall(inputData)
   
-    const response = await fetch('/api/ai', {
-        method : 'POST',
-        headers : { 'Content-Type' : 'application/json' },
-        body : JSON.stringify({ 
-            inputData
-         })
-    })
-    
-    console.log(response)
-    const data = await response.json()
     if ('error' in data) {
       setOutputError(data.error)
     }
@@ -67,6 +61,8 @@ function App() {
     <>
     <div className="bg"></div>
     <main>
+      <Header/>
+      <Header_Info/>
       <div className="app-content">
         <AnimatePresence>
           {modalOpen &&

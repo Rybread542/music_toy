@@ -5,7 +5,8 @@
 */
 
 import { spawn } from 'child_process'
-import { findLinks } from './music_links.mjs'
+import { findLinks } from './musicLinks.mjs'
+import { normalizeString } from '../misc_utils/clientSearchTools.mjs'
 
 
 /**
@@ -17,8 +18,8 @@ export async function getRecommendations(inputData, spotifyAuthToken) {
     let pyFormattedData = JSON.stringify({
         input_type : inputData.inputType,
         output_type : inputData.outputType,
-        input_artist : inputData.inputArtist,
-        input_title : inputData.inputTitle,
+        input_artist : normalizeString(inputData.inputArtist),
+        input_title : inputData.inputTitle ? normalizeString(inputData.inputTitle): inputData.inputTitle,
         input_date_range : inputData.dateRange,
         input_pop_val : inputData.popVal,
         input_comment : inputData.inputComment

@@ -94,7 +94,7 @@ export function Form_Data_Display({formData}) {
                         <img src={formData.displayData.resultImg} alt="" />
                     </div>
 
-                    {formData.inputType != 'artist' &&
+                    {formData.formData.inputType != 'artist' &&
                     <div className="input-info">
                         {formData.displayData.resultTitle.length > 20 ?
                         <Marquee_Text text={formData.displayData.resultTitle}
@@ -138,9 +138,9 @@ export function Form_Data_Display({formData}) {
                         <i className="fa-solid fa-clover"></i>
                         <p>{formData.formData.popVal}</p>
                     </div>
-                    {formData.formData.comment && (
+                    {formData.formData.inputComment && (
                         <div className="form-display-comment">
-                            <p>{formData.formData.comment}</p>
+                            <p>{formData.formData.inputComment}</p>
                         </div>
                     )}
                 </div>

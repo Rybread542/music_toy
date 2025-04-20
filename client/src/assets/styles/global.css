@@ -1,6 +1,5 @@
 @import url('https://fonts.googleapis.com/css2?family=Zain:ital,wght@0,200;0,300;0,400;0,700;0,800;0,900;1,300;1,400&display=swap');
-
-
+@import url('https://fonts.googleapis.com/css2?family=Cherry+Bomb+One&family=Quantico:ital,wght@0,400;0,700;1,400;1,700&display=swap');
 :root {
     --bg-color: #000000;
     --bg-color-2-purp: #130d2e;
@@ -22,6 +21,7 @@
     --font-primary: #eaf3ffe5;
     --font-secondary-dark: #000820;
     --font-family-main: 'Zain', 'Gill Sans', 'Gill Sans MT', 'Calibri', 'Trebuchet MS', sans-serif;
+    --font-family-header: 'Quantico', 'Gill Sans', 'Gill Sans MT', 'Calibri', 'Trebuchet MS', sans-serif;
     --border-radius-window: 4px;
     --window-shadows: 1px 3px 10px 1px var(--accent-color-greyblue);
     --window-shadows-purp: 1px 3px 10px 1px #2c1779ea;
@@ -37,6 +37,7 @@ html {
     color: var(--font-primary);
     font-family: var(--font-family-main);
     font-size: 20px;
+    overflow: hidden;
 }
 
 main {
@@ -46,6 +47,7 @@ main {
     display: flex;
     justify-content: center;
     align-items: center;
+    position: relative;
 }
 
 .app-content {
@@ -53,10 +55,9 @@ main {
     width: 70%;
     display: grid;
     grid-template-columns: 1fr;
-    grid-template-rows: 1fr 2rem 1fr 5rem;
+    grid-template-rows: 1fr clamp(1rem, 5vh, 1.5rem) 1fr;
     justify-content: center;
     align-items: center;
-    overflow: hidden;
 }
 
 .modal-container {
@@ -109,6 +110,69 @@ main {
     
 }
 
+
+.header-drag-container {
+    position: absolute;
+    top: 1rem;
+    left: 1rem;
+    z-index: 1000;
+    padding: 0.5rem 1.75rem;
+    border-radius: 20px;
+    overflow: hidden;
+    box-shadow: var(--window-shadows-purp);
+    border: 4px solid var(--output-item-purp-trans);
+}
+
+.header-inner-container {
+    --header-swirl-1: #5A24FF;
+    --header-swirl-2: #007BFF;
+    --header-swirl-3: #C327FF;
+    --header-swirl-4: #0f04a8;
+    
+    position: absolute;
+    background: conic-gradient(
+        from 45deg at 50% 50%,
+        var(--header-swirl-4),
+        var(--header-swirl-1) 25%,
+        var(--header-swirl-2) 50%,
+        var(--header-swirl-3) 75%,
+        var(--header-swirl-4) 90%)
+        ;
+
+    width: 100%;
+    height: 100%;
+    inset: 0;
+    scale: 3;
+}
+
+.header-text {
+    font-family: var(--font-family-header);
+    text-shadow: 2px 3px 3px var(--accent-color-darkgrey);
+    position: relative;
+    pointer-events: none;
+}
+
+.header-info-container {
+    z-index: 1000;
+    position: absolute;
+    top: 2.5rem;
+    left: 10rem;
+}
+
+.header-info-text-container {
+    background-color: var(--font-primary);
+    color: var(--font-secondary-dark);
+    padding: 0.25rem;
+    height: 12rem;
+    width: 10rem;
+    overflow-y: scroll;
+    border-radius: var(--border-radius-window);
+    scrollbar-color: grey transparent;
+    user-select: none;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
 
 /*                         Input   Form                 */
 
@@ -220,7 +284,7 @@ main {
 }
 
 .search-display-info {
-    font-size: 1rem;
+    font-size: clamp(0.75rem, 2vw, 1rem);
     text-align: right;
 }
 
@@ -245,13 +309,17 @@ main {
 }
 
 
-.output-options-date-label, .output-options-variety-label {
+.output-options-date-label, .output-options-variety-container {
     display: flex;
     justify-content: space-between;
 }
 
+.output-options-variety-label {
+    display: flex;
+    gap: 0.15rem;
+}
+
 .date-range-label, .variety-label {
-    display: inline;
     padding: 0 0.15rem;
     background-color: var(--accent-color-lighter-greyblue);
     border-radius: var(--border-radius-window);
@@ -263,6 +331,7 @@ main {
     display: flex;
     flex-direction: column;
     justify-content: center;
+    position: relative;
 }
 
 .submit-button-container {
@@ -326,7 +395,7 @@ main {
 }
 
 
-.input-reset-button, .form-resubmit-button {
+.input-reset-button, .form-resubmit-button, .output-cycle-button {
     border: none;
     font-size: 1rem;
     color: var(--font-primary);
@@ -428,8 +497,8 @@ main {
     display: grid;
     position: relative;
     grid-template-columns: 1fr;
-    grid-template-rows: 2rem 2rem 125px 3rem;
-    width: clamp(15rem, 50%, 20rem);
+    grid-template-rows: 2rem 2rem 125px 4rem;
+    width: 20rem;
     height: max-content;
     padding: 0.5rem;
     background-color: var(--window-color-darkblue);
@@ -488,10 +557,31 @@ main {
     text-align: right;
 }
 
-.form-display-output-options, .form-display-option {
+
+.form-display-output-options {
+    display: grid;
+    grid-template-rows: 1fr 1fr;
+    grid-template-columns: 1fr 1fr;
+    align-items: center;
+    justify-items: center;
+}
+
+.form-display-option {
     display: flex;
     align-items: center;
     justify-content: space-around;
+}
+
+.form-display-comment {
+    grid-column: 1/3;
+}
+
+#date-range {
+    grid-column: 1/2;
+}
+
+#variety-val {
+    grid-column: 2/3;
 }
 
 .form-display-option i {
@@ -515,9 +605,15 @@ main {
     width: 60%;
 }
 
-.app-buttons button {
+.app-buttons button, .output-cycle-button {
     background: none;
-    font-size: 1.5rem;
+    font-size: clamp(1rem, 5vh, 1.5rem);
+}
+
+.output-cycle-button-container {
+    position: relative;
+    top: 70px;
+    left: 20px;
 }
 
 .output-results-container, .output-load-container {
@@ -527,18 +623,20 @@ main {
     justify-content: center;
     justify-self: center;
     width: 100%;
+    height: 100%;
+    position: relative;
 }
 
 
 .output-results {
     display: grid;
     justify-content: center;
-    align-items: center;
+    align-items: baseline;
     position: relative;
+    gap: 2rem;
     grid-template-rows: 1fr;
     grid-template-columns: 1fr 1fr 1fr;
-    gap:1rem;
-    width: 100%;
+    width: clamp(40rem, 85%, 60rem);
     height: 75%;
 }
 
@@ -561,8 +659,6 @@ main {
 
 .output-results-item {
     display: grid;
-    grid-template-columns: 1fr;
-    grid-template-rows: 1fr 100px;
     justify-items: center;
     position: relative;
     gap: 1rem;
@@ -576,9 +672,6 @@ main {
 }
 
 .output-item-details {
-    justify-content: baseline;
-    align-items:center;
-    justify-content: space-between;
     position: relative;
     width: clamp(100px, 100%, 200px);
     aspect-ratio: 1/1;
@@ -604,17 +697,17 @@ main {
     text-align: left;
     position: absolute;
     z-index: -1;
-    font-size: clamp(0.5rem, 2vw, 1rem);
+    font-size: clamp(0.5rem, 2.5vh, 1rem);
 }
 
 
 
 .output-item-links {
     display: flex;
+    flex-direction: column;
     background-color: transparent;
     align-items: center;
     justify-content: space-around;
-    gap: 0.75rem;
     justify-self: baseline;
     position: absolute;
     z-index: -1;
@@ -651,4 +744,97 @@ main {
 
 .error-container {
     padding: 0.75rem;
+    grid-column: 2/3;
+    align-self: center;
+}
+
+/*                        misc                      */
+
+
+.output-options-comment h4{
+    display: inline;
+}
+
+.tooltip-container {
+    position: relative;
+    display: inline;
+}
+
+.tooltip-container i {
+    color: var(--font-primary);
+    font-size: 0.8rem;
+    margin-left: 0.15rem;
+}
+
+.tooltip-text {
+    background-color: var(--font-primary);
+    font-size: 0.65rem;
+    color: var(--font-secondary-dark);
+    padding: 0.75rem;
+    text-align: left;
+    z-index: 99;
+    width: 7rem;
+    text-wrap: wrap;
+    border-radius: var(--border-radius-window);
+    box-shadow: 1px 1px 5px 1px var(--font-secondary-dark);
+    position: absolute;
+    pointer-events: none;
+}
+
+.output-options-comment > .tooltip-container{
+    top: 0;
+    left: 0;
+}
+
+
+
+
+
+@media only screen and (max-height: 850px) {
+    .output-item-details {
+        width: clamp(150px, 100%, 175px);
+    }
+}
+
+@media only screen and (max-height: 700px) {
+    .form-data-display {
+        grid-template-rows: 1.5rem 1.5rem 100px 3rem;
+    }
+
+    .output-item-details {
+        width: clamp(100px, 100%, 150px);
+    }
+
+}
+
+@media only screen and (max-height: 550px) {
+    .form-data-display {
+        grid-template-rows: 1.2rem 1.2rem 100px 2rem;
+    }
+
+}
+
+@media only screen and (max-width: 700px) {
+    .output-results {
+        width: 300px;
+        grid-template-columns: 1fr;
+    }
+
+
+}
+
+@media only screen and (max-width: 600px) {
+    .form-data-display {
+       width: 15rem;
+    }
+
+
+}
+
+@media only screen and (max-width: 400px) {
+    .form-data-display {
+       width: 12rem;
+    }
+
+
 }

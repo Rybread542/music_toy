@@ -71,7 +71,8 @@ export function Input_Type({
 
                     <AnimatePresence>
                         {inputStep > 1 &&
-                            <Input_Reset_Button handleReset={handleResetClick} />
+                            <Input_Reset_Button handleReset={handleResetClick}
+                            disabled={loading} />
                         }
                     </AnimatePresence>
 

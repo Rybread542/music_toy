@@ -2,9 +2,8 @@ import express, { json } from 'express'
 import cors from 'cors'
 import { configDotenv } from 'dotenv'
 import { getRecommendations } from './algo_utils/processRecData.mjs'
-import { spotifyGetAccessToken } from './algo_utils/music_links.mjs'
-import { liveSearch } from './misc_utils/liveSearch.mjs'
-import { getSpotifyData } from './misc_utils/inputSearch.mjs'
+import { spotifyGetAccessToken } from './algo_utils/musicLinks.mjs'
+import { inputDisplaySearch, liveSearch } from './misc_utils/clientSearchTools.mjs'
 
 
 const app = express()
@@ -47,11 +46,12 @@ app.post('/api/search', async (req, res) => {
     res.json(searchResults)
 })
 
-app.post('/api/spotsearch', async (req, res) => {
+app.post('/api/inputdisplay', async (req, res) => {
     const {inputType, inputArtist, inputTitle} = req.body.searchQuery
-    const spotData = await getSpotifyData(inputType, inputArtist, inputTitle, spotifyAuthToken)
-    console.log(spotData)
-    res.json(spotData)
+    console.log(inputType, inputArtist, inputTitle)
+    const displayData = await inputDisplaySearch(inputType, inputArtist, inputTitle, spotifyAuthToken)
+    console.log(displayData)
+    res.json(displayData)
 })
 
 app.listen(PORT, () => {

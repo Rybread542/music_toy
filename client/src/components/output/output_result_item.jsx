@@ -1,14 +1,26 @@
-import { useState } from "react"
+import { useState, useRef, useEffect } from "react"
 import { Marquee_Text } from "../misc/marquee_text"
 import { motion, useReducedMotion } from 'motion/react'
 import { getFloatArray } from "../../util/floatAnimationArray"
+import { Memo_Image } from "../misc/optimized_img"
+import { useWindowDimensions } from "../../hooks/windowDimensions"
 
 
 
-export function Output_Result_Item({item, index, img}) {
+export function Output_Result_Item({item, index, img, token, front}) {
 
-    const [ selected, setSelected ] = useState(false)
+    const [variant, setVariant] = useState('rest')
+    const [width, height] = useWindowDimensions()
+
     const reduceMotion = useReducedMotion()
+
+    const handleSelect = () => {
+        setVariant(v => (v === 'selected' ? 'rest' : 'selected'))
+    }
+
+    useEffect(()=> {
+        setVariant('rest')
+    }, [token, width])
 
     
     const driftAnimation = reduceMotion ? 
@@ -29,20 +41,62 @@ export function Output_Result_Item({item, index, img}) {
 
 
     const itemInfoVariants = {
-        rest: {},
+        initial: {
+            opacity: 0,
+            bottom: 0,
+            left:0, 
+        },
+
+        rest: {
+            opacity: 0,
+            bottom: 0,
+            left: 0,
+            transition: {type: 'spring', bounce: 0, duration: 0.3}
+        },
+
         hover: {
             opacity: 1,
-            y: 100,
-            zIndex: 1
+            x: 0,
+            y: '105%',
+            zIndex: 1,
+            transition: {type: 'spring', bounce: 0, ease: 'easeOut'}
+        },
+
+        selected: {
+            opacity: 1,
+            x: 0,
+            y: '105%',
+            zIndex: 1,
+            transition: {type: 'spring', bounce: 0, ease: 'easeOut'}
         }
     }
 
     const linksVariants = {
-        rest: {},
+        initial: {
+            opacity: 0,
+            top: 0,
+            right: 0, 
+        },
+
+        rest: {
+            opacity: 0,
+            top: 0,
+            right: 0,
+            transition: {type: 'spring', bounce: 0, duration: 0.3}
+        },
+
         hover: {
             opacity: 1,
-            y: 150,
-            zIndex: 1
+            x: 45,
+            zIndex: 1,
+            transition: {type: 'spring', bounce: 0, ease: 'easeOut'}
+        },
+
+        selected: {
+            opacity: 1,
+            x: 45,
+            zIndex: 1,
+            transition: {type: 'spring', bounce: 0, ease: 'easeOut'}
         }
     }
 
@@ -51,6 +105,7 @@ export function Output_Result_Item({item, index, img}) {
             scale: 0
         },
         
+        selected: {scale: 1},
         rest: {scale: 1},
         hover: {y: -15, scale: 1},
         tap: {y: 5, scale: 0.95},
@@ -58,8 +113,8 @@ export function Output_Result_Item({item, index, img}) {
     }
 
     const imgVariants = {
-        initial: {opacity: 0},
-        rest: {opacity: 1, transition: {delay: 1, duration: 0.6}},
+        rest: {opacity: 1},
+        selected: {opacity: 1},
         hover: {opacity: 1},
         tap: {opacity: 1},
     }
@@ -74,24 +129,37 @@ export function Output_Result_Item({item, index, img}) {
             <motion.div className="output-results-item"
             variants={itemVariants}
             initial= 'initial'
-            whileHover='hover'
             whileTap='tap'
             whileInView='drift'
-            animate={selected ? 'hover' : 'rest'}
-            onClick={() => setSelected((select) => !select)}
+            animate={variant}
+            onClick={handleSelect}
+            onHoverStart={() => variant !== 'selected' && setVariant('hover')}
+            onHoverEnd  ={() => variant !== 'selected' && setVariant('rest')}
             style={{willChange: 'transform',
                 transformPerspective: 800,
+                pointerEvents: front ? 'auto':'none'
                 }}
-            key={index}
             >
                 <div className="output-item-details">
-                    <motion.div className="output-item-img" variants={imgVariants}>
-                        <img src={img ? img : item.outputType === 'artist' ? '/images/artist-photo-default.png' : '/images/album-art-default.png'} 
+
+                    <motion.div className="output-item-img" 
+                    variants={imgVariants}
+                    initial={false}>
+                        {img ? 
+                        <Memo_Image
+                        url={img}
+                        width={200}
+                        height={200}
+                        className={'output-item-img-inner'}/>
+                        :
+                        <img src={item.outputType === 'artist' ? '/images/artist-photo-default.png' : '/images/album-art-default.png'} 
                         alt={item.outputType === 'artist' ? item.outputArtist : item.outputTitle} 
                         onError={imageError}/>
+                        }
+                        
                     </motion.div>
+
                     <motion.div className="output-item-info"
-                    initial={{bottom: 0, left: 0, opacity: 0}}
                     variants={itemInfoVariants}>
                         {item.outputType === "album" || item.outputType === "track" ?
                         (<>
@@ -100,7 +168,7 @@ export function Output_Result_Item({item, index, img}) {
                                 text={item.outputTitle}
                                 bold={true}
                                 id={'output-item-title'}
-                                maxWidth="10rem"/>
+                                maxWidth="15rem"/>
                                 :
                                 <p style={{fontWeight : 'bold'}} className='output-item-title'>{item.outputTitle}</p>
                             }
@@ -109,7 +177,7 @@ export function Output_Result_Item({item, index, img}) {
                                 text={item.outputArtist}
                                 bold={false}
                                 id={'output-item-artist'}
-                                maxWidth="10rem"/>
+                                maxWidth="15rem"/>
                                 :
                                 <p className='output-item-artist'>{item.outputArtist}</p>
                             }
@@ -132,8 +200,7 @@ export function Output_Result_Item({item, index, img}) {
                         </>)}
                     </motion.div>
                     <motion.div className="output-item-links"
-                    variants={linksVariants}
-                    initial={{bottom: 0, left: 0, opacity: 0}}>
+                    variants={linksVariants}>
                         {item.spotifyLink &&
                         <a href={item.spotifyLink} target="_blank" className="output-item-link-icon" id='spotify-icon'>
                             <i className="fa-brands fa-spotify"></i>

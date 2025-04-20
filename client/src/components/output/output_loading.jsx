@@ -34,8 +34,6 @@ export function Output_Loading() {
                     duration: 0.5
                     }
                 }}>
-            
-           
 
                 {
                 degrees.map((deg) => {

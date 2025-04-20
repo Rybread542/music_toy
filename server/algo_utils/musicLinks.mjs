@@ -72,7 +72,7 @@ async function getSpotifyLink(type, artist, title, token) {
         // we will simply return the entire object to deal with elsewhere in case of error
         // usually this will be a 401 bad token since tokens last 1hr
         if (data.error) {
-            return {spotLink: data, artistPhoto : null}
+            return {spotLink: data, artistPhoto : 'artist-photo-default_ezocsj'}
         }
 
         if (type === 'artist') {
@@ -87,7 +87,7 @@ async function getSpotifyLink(type, artist, title, token) {
     catch (e) {
         console.log(`error searching spot link: ` + e)
         console.log(`Couldn\'t find a spotify link for ${title}` )
-        return {spotLink: null, artistPhoto: null}
+        return {spotLink: null, artistPhoto: 'artist-photo-default_ezocsj'}
     }
 
 }
@@ -128,18 +128,18 @@ async function getYoutubeLink(type, artist, title) {
 
 //MB Album art search
 
-async function getAlbumArt(mbid) {
+export async function getAlbumArt(mbid) {
 
     try { 
         const covertArtApi = new CoverArtArchiveApi()
 
-        const coverData = await covertArtApi.getReleaseGroupCover(mbid, 'front')
-        return coverData.url
+        const coverData = await covertArtApi.getReleaseGroupCovers(mbid)
+        return coverData.images[0].thumbnails['large']
     }
 
     catch(e) {
         console.log('error grabbing cover art', e)
-        return null
+        return 'album-art-default_rjd8q2'
     }
 }
 

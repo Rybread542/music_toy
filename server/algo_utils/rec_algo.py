@@ -125,31 +125,47 @@ def recommend(input_data: dict):
         
     tags_embed = get_input_embed(tags_string)
 
+   
     # query db with embedding and artist ID to filter
     result = db_execute_stmt(query, (tags_embed,))
 
+    if not result:
+        return json.loads(os.getenv('ERROR_ANN_QUERY_FAIL'))
+    
     # shuffle results for pseudo variety
     random.shuffle(result)
 
     # pick 3, create list of objects, and return
     results_list = []
+    artList = []
+    while (len(results_list) < 3):
 
-    for item in result[:3]:
-        if output_type == 'artist':
-            results_list.append({
-                'outputType' : f'{output_type}',
-                'outputArtist' : f'{item[0]}',
-                'outputGenres' : f'{item[1]}'
-            })
+        if (len(result) > 0):
+            item = result.pop()
+
         else:
-            results_list.append({
-                'outputType' : f'{output_type}',
-                'outputArtist' : f'{item[1]}',
-                'outputTitle' : f'{item[0]}',
-                'outputYear' : f'{item[2]}',
-                'outputGenres' : f'{item[3]}',
-                'outputMBID' : f'{item[4]}'
-            })
+            break
+        
+        artist = item[1] if output_type != 'artist' else item[0]
+        if artist not in artList: 
+            artList.append(artist)
+
+            if output_type == 'artist':
+                results_list.append({
+                    'outputType' : f'{output_type}',
+                    'outputArtist' : f'{item[0]}',
+                    'outputGenres' : f'{item[1]}'
+                })
+
+            else:
+                results_list.append({
+                    'outputType' : f'{output_type}',
+                    'outputArtist' : f'{item[1]}',
+                    'outputTitle' : f'{item[0]}',
+                    'outputYear' : f'{item[2]}',
+                    'outputGenres' : f'{item[3]}',
+                    'outputMBID' : f'{item[4]}'
+                })
 
     logger.info(f'FINAL RESULTS: {results_list}')
     return results_list
