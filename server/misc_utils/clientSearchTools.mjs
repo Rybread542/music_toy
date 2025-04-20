@@ -17,49 +17,43 @@ const db = postgres(db_details)
 
 export async function liveSearch (type, artist, q) {
 
-    console.log(`livesearch firing artist: ${type}, ${artist}, ${q}`)
+    console.log(`livesearch firing: ${type}, ${artist}, ${q}`)
     const queryStart = performance.now()
     let results
     if (type === 'artist') {
         results = await db`
             SELECT
-                artist.name,
-                similarity(artist.name_search, ${q}) sim
+                artist.name
 
             FROM
                 artist
             
-            where artist.name_search % ${q}
-            
-            group by artist.name, artist.id
-            order by sim desc,   
-            artist.id asc
+            order by artist.name_search <-> ${q}  
               
-            
             LIMIT 20;`
     }
 
     else {
         results = await db`
-            SELECT DISTINCT ON (${db(type)}.title)
+            SELECT
                 ${db(type)}.title,
                 artist.name
 
             FROM 
                 ${db(type)}
 
-            LEFT JOIN artist_credit 
+            JOIN artist_credit 
             ON artist_credit.id = ${db(type)}.artist_credit
 
-            LEFT JOIN artist
+            JOIN artist
             ON artist.id = artist_credit.artist_id
 
             ${type === 'track' ? 
                 db`
-                LEFT JOIN album_variations av
+                JOIN album_variations av
                 ON track.album_id = av.id
                 
-                LEFT JOIN album
+                JOIN album
                 ON av.album_group = album.id`
                 : 
                 db``}
@@ -67,12 +61,12 @@ export async function liveSearch (type, artist, q) {
             WHERE
                 artist.id != 1
                 AND artist.name_search % ${artist}
-                AND ${db(type)}.title_search LIKE ${q + '%'}
-                AND 'Single' <> ALL(album.release_type) AND 'Compilation' <> ALL(album.release_type)
+                AND ${db(type)}.title_search LIKE ${q} || '%'
+                AND 'Single' <> ALL(album.release_type) 
+                AND 'Compilation' <> ALL(album.release_type)
 
-            GROUP BY
-            ${db(type)}.title, ${db(type)}.id, artist.id, artist.name
-            
+            GROUP BY ${db(type)}.title, track.id, artist.name
+            ORDER BY ${db(type)}.title, ${db(type)}.id
             
             LIMIT 20;
         `

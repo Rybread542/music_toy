@@ -167,7 +167,7 @@ export const Input_Search = forwardRef(({
                 className="form-text-input"
                 placeholder={inputType === 'artist' ? 'Artist' : 'Title'}
                 value={inputType === 'artist' ? inputArtist : inputTitle ?? ''}
-                onChange={(e) => {handleSearchUpdate(e)}}
+                onChange={(e) => handleSearchUpdate(e)}
                 onFocus={() => setSearchResults([])}
                 disabled={!enabled}
                 ref={ref}
@@ -191,7 +191,7 @@ export const Input_Search = forwardRef(({
 
                 <AnimatePresence>
                     
-                    {(searchQuery.length >= 3) &&
+                    {searchQuery.length >= 3 &&
                     (
                     <motion.div className="live-search-container"
                     ref={windowRef}
