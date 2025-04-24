@@ -13,7 +13,7 @@ export function Input_Search_Display({displayData, loading, type}) {
         )
     }
 
-    else if (!displayData.resultArtist) {
+    if (!displayData || !displayData.resultArtist) {
         return (
             <motion.div className="input-search-display"
             initial={{opacity: 0}}
@@ -23,6 +23,7 @@ export function Input_Search_Display({displayData, loading, type}) {
             </motion.div>
         )
     }
+
 
     return (
 
@@ -90,10 +91,14 @@ export function Input_Search_Display({displayData, loading, type}) {
                         <p style={{fontWeight : 'bold'}} id="search-display-artist">{displayData.resultArtist}</p>
                     }
 
-                    {displayData.resultGenres.length > 0 &&
+                    {displayData.resultGenres &&
+
+                    (displayData.resultGenres.length > 0 ?
                     displayData.resultGenres.slice(0, 3).map((genre, index) => {
                         return <p key={index}>{genre}</p>
-                    })}
+                    })
+                    :
+                    <p>No genres found</p>)}
                 </>)
                 }
             </div>

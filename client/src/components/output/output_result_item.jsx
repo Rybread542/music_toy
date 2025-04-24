@@ -11,6 +11,7 @@ export function Output_Result_Item({item, index, img, token, front}) {
 
     const [variant, setVariant] = useState('rest')
     const [width, height] = useWindowDimensions()
+    const mobileHeight = height < 600
 
     const reduceMotion = useReducedMotion()
 
@@ -56,16 +57,16 @@ export function Output_Result_Item({item, index, img, token, front}) {
 
         hover: {
             opacity: 1,
-            x: 0,
-            y: '105%',
+            x: mobileHeight ? '8rem' :  0,
+            y: mobileHeight ? 0 : '105%',
             zIndex: 1,
             transition: {type: 'spring', bounce: 0, ease: 'easeOut'}
         },
 
         selected: {
             opacity: 1,
-            x: 0,
-            y: '105%',
+            x: mobileHeight ? '8rem' :  0,
+            y: mobileHeight ? 0 : '105%',
             zIndex: 1,
             transition: {type: 'spring', bounce: 0, ease: 'easeOut'}
         }

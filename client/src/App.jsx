@@ -9,6 +9,7 @@ import { AnimatePresence } from 'motion/react'
 import { recommendSearchCall } from './util/apiSearch'
 import { Header } from './components/misc/header/header'
 import { Header_Info } from './components/misc/header/header_info'
+import { useWindowDimensions } from './hooks/windowDimensions'
 
 function App() {
 
@@ -18,6 +19,9 @@ function App() {
   const [ load, setLoad ] = useState(true)
   const [ modalOpen, setModalOpen ] = useState(true)
   const [ outputError, setOutputError ] = useState('')
+
+  const [ width, height ] = useWindowDimensions()
+  const mobileWidth = width < 600
 
   async function handleFormSubmit(inputData) {
     setLoad(true)
@@ -61,8 +65,10 @@ function App() {
     <>
     <div className="bg"></div>
     <main>
-      <Header/>
-      <Header_Info/>
+      {!mobileWidth &&
+      <Header/>}
+      {!submitted &&
+      <Header_Info/>}
       <div className="app-content">
         <AnimatePresence>
           {modalOpen &&

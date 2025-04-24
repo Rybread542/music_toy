@@ -823,12 +823,43 @@ main {
 
 }
 
+@media only screen and (max-width: 850px) {
+    .header-info-container {
+        top: 5rem;
+        left: 2.5rem;
+    }
+
+    .header-drag-container {
+        scale: 0.75;
+    }
+}
+
+@media only screen and (max-width: 700px) {
+    .header-info-container {
+        top: 17rem;
+        left: 1.5rem;
+    }
+
+    .header-drag-container {
+        top: 13rem;
+        left:0;
+    }
+}
+
 @media only screen and (max-width: 600px) {
     .form-data-display {
        width: 15rem;
     }
 
+    .output-options-container {
+        grid-template-columns: 1fr;
+        width: 12rem;
+        gap: 0.5rem;
+    }
 
+    .form-textarea {
+        width: 80%;
+    }
 }
 
 @media only screen and (max-width: 400px) {
@@ -836,5 +867,7 @@ main {
        width: 12rem;
     }
 
-
+    .output-options-container {
+        width: 10rem;
+    }
 }

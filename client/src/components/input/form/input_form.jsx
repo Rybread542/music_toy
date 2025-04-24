@@ -20,6 +20,7 @@ export function Input_Form({handleFormSubmit, setCurrentFormData}) {
     const [ inputType, setInputType ] = useState('track')
     const [ inputStep, setInputStep ] = useState(1)
     const [ displayData, setDisplayData ] = useState(null)
+    const [ searchLoad, setSearchLoad ] = useState(false)
     const [ inputConfirmed, setInputConfirmed ] = useState(false)
     const [ mountKey, setMountKey ] = useState(0)
 
@@ -87,10 +88,11 @@ export function Input_Form({handleFormSubmit, setCurrentFormData}) {
     }
 
     const handleInputDisplaySearch = async () => {
+        setSearchLoad(true)
         const searchQuery = {inputType, inputArtist, inputTitle}
         const data = await displaySearchCall(searchQuery)
         setDisplayData(data)
-        
+        setSearchLoad(false)
         if (data.resultArtist) {
             setInputArtist(data.resultArtist)
             setInputTitle(data.resultTitle)
@@ -118,14 +120,14 @@ export function Input_Form({handleFormSubmit, setCurrentFormData}) {
     }
     
     
-
     return (
 
             <Form_Steps_Wrapper handleFormSubmit={handleLocalSubmit} 
             formStep={formStep} 
             setFormStep={setFormStep}
             inputStep={inputStep}
-            inputConfirmed={inputConfirmed}>
+            inputConfirmed={inputConfirmed}
+            searchLoad={searchLoad}>
 
                         {formStep === 1 &&
                         

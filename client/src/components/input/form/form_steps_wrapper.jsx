@@ -6,7 +6,8 @@ export function Form_Steps_Wrapper ({children,
     handleFormSubmit,
     formStep, 
     setFormStep, 
-    inputConfirmed
+    inputConfirmed,
+    searchLoad
     }) {
 
     const reduceMotion = useReducedMotion()
@@ -55,7 +56,7 @@ export function Form_Steps_Wrapper ({children,
                         handleButtonClick={() => setFormStep(formStep+1)}
                         key={'next-' + formStep}/>}
 
-                        {formStep > 1 &&
+                        {formStep > 1 && !searchLoad &&
                         <Modal_Button 
                         direction={'back'} 
                         handleButtonClick={() => setFormStep(formStep-1)}
