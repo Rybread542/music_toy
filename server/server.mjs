@@ -9,12 +9,14 @@ import { inputDisplaySearch, liveSearch } from './misc_utils/clientSearchTools.m
 const app = express()
 const PORT = process.env.LISTEN_PORT
 
+// Generate an intial spotify token
 let spotifyAuthToken
 (async()=> {
     spotifyAuthToken = await spotifyGetAccessToken()
     console.log(`token: ${spotifyAuthToken}`)
 })()
 
+// Refresh every ~60m
 setInterval(async () => {
     spotifyAuthToken = await spotifyGetAccessToken()
     console.log(`token refreshed: ${spotifyAuthToken}`)
@@ -22,13 +24,6 @@ setInterval(async () => {
 
 
 app.use(json())
-
-
-app.get('/', (req, res) => {
-
-    console.log('test')
-
-})
 
 app.post('/api/ai', async (req, res) => {
     console.log('request body: ', req.body)
@@ -54,6 +49,10 @@ app.post('/api/inputdisplay', async (req, res) => {
     res.json(displayData)
 })
 
-app.listen(PORT, () => {
+const server = app.listen(PORT, () => {
     console.log(`Running on port ${PORT}`)
 })
+
+server.requestTimeout = 0
+server.headersTimeout = 0
+server.keepAliveTimeout = 0

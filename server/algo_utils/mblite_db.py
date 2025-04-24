@@ -1,7 +1,5 @@
-import json
 import psycopg2
 import os
-import sys
 from dotenv import load_dotenv
 from logging_config import logger
 
@@ -24,6 +22,7 @@ db_conn = psycopg2.connect(
 def get_db_cursor():
     return db_conn.cursor()
 
+# Execute a single query against the music database
 def db_execute_stmt(query: str, args: tuple):
     cursor = get_db_cursor()
     try:
@@ -38,11 +37,33 @@ def db_execute_stmt(query: str, args: tuple):
         return None
 
 
-def build_ann_query(output_type, input_artist_id, input_date_range, input_pop_val):
-    ef_search = 100 + (input_pop_val * 5)
-    artist_cutoff = 500000 + (input_pop_val*10000)
+# Main algorithm builder
+# Returns a dynamic ANN vector query based on input type and options
+def build_ann_query(output_type: str, input_artist_id: int, input_date_range: list, input_pop_val: int):
+
+    # date filter
     date_start, date_end = input_date_range
 
+
+    # Set ef_search for higher or lower HNSW Indexed ANN recall depending on user input
+    ef_search = 100 + (input_pop_val * 5)
+
+
+    # In the database, Artist ID can be leveraged as a pseudo "popularity" value, as lower
+    # IDs tend to correlate with more commercially successful artists.
+    # The cutoff filters results by artists with ID > n in the query.
+
+    # This helps to prevent recommendations which are tragically obscure, to the point
+    # where you could not feasibly listen to the music if you tried because it is so unknown
+    # and, importantly, not uploaded anywhere
+    artist_cutoff = 500000 + (input_pop_val*10000)
+
+
+
+    # The 'track' table utilizes IVFFlat index rather than HNSW because of sheer size,
+    # and because recall was a little too strong for some queries, resulting in very few
+    # or no results.
+    # So we set either IVFFlat probes or ef_search depending on type
     if output_type == 'track':
         limit = 100 + (input_pop_val * 5)
         ef_set = f'SET ivfflat.probes = {ef_search / 5}; \n'
@@ -51,6 +72,16 @@ def build_ann_query(output_type, input_artist_id, input_date_range, input_pop_va
         limit = 10 + input_pop_val
         ef_set = f'SET hnsw.ef_search = {ef_search}; \n'
 
+
+
+    # Build query for artist, album or track
+    # Query selects ANN vector matches and then
+    # joins them to metadata tables for output
+    
+    # Can be quite slow between table size (track is ~50M rows!) 
+    # and the fact that I host the db in my closet
+
+    # ----------ARTIST---------------
     if output_type == 'artist':
         ann_select = f"""
             WITH ann_matches AS (
@@ -82,7 +113,9 @@ def build_ann_query(output_type, input_artist_id, input_date_range, input_pop_va
             ON ann.id = art.id
             
             ORDER BY ann.dist;"""
+        
 
+    # -----------------ALBUM--------------------
     if output_type == 'album':
         ann_select = f"""
             WITH ann_matches AS (
@@ -134,8 +167,9 @@ def build_ann_query(output_type, input_artist_id, input_date_range, input_pop_va
             ORDER BY ann.dist;"""
         
 
+
+    # ---------------------------TRACK-------------------------
     if output_type == 'track':
-        
 
         ann_select = f"""
             WITH ann_matches AS (
@@ -165,7 +199,7 @@ def build_ann_query(output_type, input_artist_id, input_date_range, input_pop_va
                 WHERE art.id != 1
                 AND art.id != {input_artist_id}
                 AND art.id <= {artist_cutoff}
-                AND tr.duration > 90000
+                AND tr.duration > 90000 
                 AND alb.release_year BETWEEN {date_start} AND {date_end}
                 AND 'Single' <> ALL(alb.release_type)
                 AND 'Compilation' <> ALL(alb.release_type)

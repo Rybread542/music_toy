@@ -1,3 +1,11 @@
+/**
+ * @module musicLinks
+ * @description helper methods for returning streaming links and 
+ * art/photos from various music APIs
+ */
+
+
+
 import { spotifyClientID, spotifyClientSecret, youtubeAPIKey } from '../misc_utils/dotenv.mjs';
 import { CoverArtArchiveApi } from 'musicbrainz-api'
 
@@ -5,8 +13,11 @@ import { CoverArtArchiveApi } from 'musicbrainz-api'
 
 // client keys
 
-// Create access token using Client Credentials flow
-// Simple fetch and return. Spotify docs are extremely vague about this setup
+/**
+ * Create a Spotify API access token 
+ * With Client Credential flow
+ * @returns {string} API token
+ */
 export async function spotifyGetAccessToken() {
     console.log('generating token')
     const tokenFetch = await fetch('https://accounts.spotify.com/api/token', {
@@ -27,6 +38,7 @@ export async function spotifyGetAccessToken() {
     return tokenJSON.access_token
 }
 
+// Quick boilerplate fetch parameters
 export function getSpotifySearchParams(token) {
     return {
         method: 'GET',
@@ -37,7 +49,14 @@ export function getSpotifySearchParams(token) {
     }
 }
 
-// Turn a title/artist query into a Spotify link
+/**
+ * Fetch a Spotify link and potentially artist photo link
+ * @param {string} type 
+ * @param {string} artist 
+ * @param {string} title 
+ * @param {string} token 
+ * @returns {Object} spotify link, artist photo link
+ */
 async function getSpotifyLink(type, artist, title, token) { 
     try {
         // Strip specials and spaces. Spotify API gets mad at them sometimes
@@ -48,18 +67,11 @@ async function getSpotifyLink(type, artist, title, token) {
 
         let artistPhoto = null
 
-        // Change 'song' to spotify-friendly 'track'
-        if (type === 'song') {
-            type = 'track'
-        }
-
         // Build query based on inputs. If searching an artist, we don't need a title
         const q = (type === 'artist' ? 
         `${artist}`
         :
         `artist:${artist} ${type}:${title}`)
-
-        // add URL params
         + `&type=${type}&limit=1`
         
         // init fetch params according to docs
@@ -69,36 +81,48 @@ async function getSpotifyLink(type, artist, title, token) {
 
         const data = await searchData.json()
 
+
         // we will simply return the entire object to deal with elsewhere in case of error
         // usually this will be a 401 bad token since tokens last 1hr
         if (data.error) {
             return {spotLink: data, artistPhoto : 'artist-photo-default_ezocsj'}
         }
 
+
+        // we leverage Spotify's helpful artist photos to display on the front end
         if (type === 'artist') {
             artistPhoto = data.artists.items[0].images[0].url
         }
-        
+
+        // returns raw url and artist photo
         const spotLink = data[type+'s'].items[0].external_urls.spotify
-        // returns raw url
         return {spotLink, artistPhoto}
     }
 
     catch (e) {
         console.log(`error searching spot link: ` + e)
         console.log(`Couldn\'t find a spotify link for ${title}` )
+
+        // if we get an empty result, we can return a default artist placeholder photo
         return {spotLink: null, artistPhoto: 'artist-photo-default_ezocsj'}
     }
 
 }
 
 
-// Youtube
+///////////////////// Youtube
 
+/**
+ * Fetch a YouTube link
+ * @param {string} type 
+ * @param {string} artist 
+ * @param {string} title 
+ * @returns {string} YouTube link or null if none found/rate limit
+ */
 async function getYoutubeLink(type, artist, title) {
+
     // youtube links are simpler to get, but much less accurate
     // best we can do is a raw search query
-    
     const q = type != 'artist' ? `${artist} ${title} ${type === 'album' ? `full album`:``}`:`${artist} music video`
 
     console.log(`query: ${q}`)
@@ -117,8 +141,6 @@ async function getYoutubeLink(type, artist, title) {
         const id = data.items[0].id.videoId
 
         const link = `https://www.youtube.com/watch?v=${id}`
-
-        console.log(`youtube link: ${link}`)
         return link
     }
 
@@ -126,8 +148,12 @@ async function getYoutubeLink(type, artist, title) {
     return null
 }
 
-//MB Album art search
 
+/**
+ * Fetch an album art image link from MusicBrainz cover art archive
+ * @param {string} mbid global ID of album
+ * @returns {string} album art link
+ */
 export async function getAlbumArt(mbid) {
 
     try { 

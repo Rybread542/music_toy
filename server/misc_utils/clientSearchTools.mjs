@@ -1,3 +1,8 @@
+/**
+ * @module clientSearchTools
+ * @description Helper functions for searching DB during user input steps
+ */
+
 import { dbHost, dbPort, dbUser, dbPass, dbName } from './dotenv.mjs'
 import { getAlbumArt, getSpotifySearchParams } from '../algo_utils/musicLinks.mjs'
 import postgres from 'postgres'
@@ -15,11 +20,25 @@ const db_details = {
 
 const db = postgres(db_details)
 
+
+/**
+ * Query for live search function
+ * @param {string} type 
+ * @param {string} artist 
+ * @param {string} q 
+ * @returns {Array} list of 20 results
+ */
 export async function liveSearch (type, artist, q) {
 
+    // Simple way to watch how slow the livesearch is and become sad
     console.log(`livesearch firing: ${type}, ${artist}, ${q}`)
     const queryStart = performance.now()
+
+
+
     let results
+
+    ///////////////// ARTIST
     if (type === 'artist') {
         results = await db`
             SELECT
@@ -33,6 +52,13 @@ export async function liveSearch (type, artist, q) {
             LIMIT 20;`
     }
 
+
+    //////////////// ALBUM/TRACK
+    // This query needs to be
+    // 1. Split into album and track. Having the fancy dynamic query block isn't worth the 
+    // headache of reading it
+    // 2. optimized, somehow. For tracks its a decision between being slow and producing
+    // hundreds of duplicates. Could be solved if the database tables were reformatted and deduped
     else {
         results = await db`
             SELECT
@@ -77,12 +103,22 @@ export async function liveSearch (type, artist, q) {
     return results
 }
 
+
+/**
+ * Query for final user input info which displays on the filled form
+ * @param {string} type 
+ * @param {string} artist 
+ * @param {string} title 
+ * @param {string} token 
+ * @returns 
+ */
 export async function inputDisplaySearch(type, artist, title, token) {
     const nArtist = normalizeString(artist)
     const nTitle = title ? normalizeString(title) : title
 
     let result
 
+    //////////////// ARTIST
     if(type ==='artist') {
         result = await db`
             SELECT
@@ -99,6 +135,12 @@ export async function inputDisplaySearch(type, artist, title, token) {
             LIMIT 1;`
     }
 
+    
+    // Album and track can occasionally be very slow.
+    // These queries attempt to balance speed with light fuzzy matching for typos
+    // or weird titles
+    // could consider removing fuzzy match for efficiency
+    /////////////////// ALBUM
     else if(type==='album') {
         result = await db`
             SELECT
@@ -128,6 +170,8 @@ export async function inputDisplaySearch(type, artist, title, token) {
             LIMIT 1;`
     }
 
+
+    ////////////// TRACK
     else {
         result = await db`
             SELECT
@@ -167,6 +211,7 @@ export async function inputDisplaySearch(type, artist, title, token) {
 
     console.log(result)
 
+    // send nulls back to client for error handling
     const resultArtist = data?.name ?? null
     const resultTitle = data?.title ?? null
     const resultYear = data?.release_year ?? null
@@ -185,6 +230,13 @@ export async function inputDisplaySearch(type, artist, title, token) {
     }
 }
 
+
+/**
+ * Grab a spotify artist image if available
+ * @param {string} artist 
+ * @param {string} token 
+ * @returns {string} image link, or null
+ */
 async function spotifyArtistImg(artist, token) {
     const q = `${artist}&type=artist&limit=1`
 
@@ -209,6 +261,12 @@ async function spotifyArtistImg(artist, token) {
     }
 }
 
+/**
+ * removes spaces, punctuation, and unaccents a string
+ * for easier db searches
+ * @param {string} string to be normalized
+ * @returns 
+ */
 export function normalizeString(string) {
     return string
     .toLowerCase()

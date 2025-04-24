@@ -10,11 +10,13 @@ import { normalizeString } from '../misc_utils/clientSearchTools.mjs'
 
 
 /**
+ * Central recommendation aggregation loop
  * @param {Object} inputData
  * 
  * @returns {Object} JSON 
 */
 export async function getRecommendations(inputData, spotifyAuthToken) {
+    // Format user input to be python friendly
     let pyFormattedData = JSON.stringify({
         input_type : inputData.inputType,
         output_type : inputData.outputType,
@@ -27,8 +29,12 @@ export async function getRecommendations(inputData, spotifyAuthToken) {
 
     console.log(pyFormattedData)
 
-    const pythonReccAlgo = spawn('bin/python', ['./algo_utils/rec_algo.py', pyFormattedData])
 
+    // Subprocess for all the main querying/vector creation, etc
+    const pythonReccAlgo = spawn('bin/python', ['./algo_utils/rec_algo.py', pyFormattedData])
+    
+
+    // TODO: needs refining. Python errors can still cause infinite loading on client
     return new Promise((resolve) => {
         let pythonData = ''
         let reccData
