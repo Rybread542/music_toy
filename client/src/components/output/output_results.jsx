@@ -1,4 +1,4 @@
-import { useState, memo } from "react"
+import { useState } from "react"
 import { useWindowDimensions } from "../../hooks/windowDimensions"
 import { Output_Result_Item } from "./output_result_item"
 import { AnimatePresence, motion } from "motion/react"

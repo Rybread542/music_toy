@@ -1,6 +1,6 @@
 import { useEffect, useMemo } from "react"
 import { Marquee_Text } from "../../misc/marquee_text"
-import { motion, AnimatePresence, useReducedMotion, useAnimate } from 'motion/react'
+import { motion, useReducedMotion, useAnimate } from 'motion/react'
 
 
 export function Form_Data_Display({formData}) {
@@ -120,7 +120,7 @@ export function Form_Data_Display({formData}) {
                         <p className="result-display-artist">{formData.displayData.resultArtist}</p>
                         }   
 
-                        {formData.displayData.resultGenres.length > 0 &&
+                        {(formData.displayData.resultGenres && formData.displayData.resultGenres.length > 0) &&
                         formData.displayData.resultGenres.slice(0, 3).map((genre, index) => {
                             return <p className="result-display-genre" key={index}>{genre}</p>
                         })}

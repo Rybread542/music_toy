@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from "react"
+import { useState, useEffect } from "react"
 import { Marquee_Text } from "../misc/marquee_text"
 import { motion, useReducedMotion } from 'motion/react'
 import { getFloatArray } from "../../util/floatAnimationArray"
